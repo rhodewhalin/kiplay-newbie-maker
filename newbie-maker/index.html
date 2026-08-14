@@ -6,87 +6,134 @@
 <title>신입사원 메이커: 20년 후의 나 — 프로토타입 v4</title>
 <style>
   :root{
-    --blue:#1f5fd6; --blue-d:#164aa8; --sky:#eaf2ff; --ink:#1b2437;
-    --line:#d6e0f2; --ok:#1f9d57; --bad:#d64545; --gold:#e2a400; --paper:#fbfdff;
-    --purple:#7a5cf0; --kipi:#0d8f8f; --pink:#d6457f;
+    --cream:#f3ecdb; --paper:#fffdf6; --ink:#1c1a17; --line:#1c1a17;
+    --yellow:#ffd23f; --yellow-d:#f0be1e; --blue:#2f6fed; --blue-d:#1e50bb; --sky:#e8f0ff;
+    --red:#e8503a; --ok:#1f9d57; --bad:#d64545; --gold:#e2a400; --purple:#7a5cf0; --kipi:#0d8f8f; --pink:#d6457f;
+    --mut:#8a7f6a;
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:"Malgun Gothic","맑은 고딕",system-ui,sans-serif;
-    background:linear-gradient(160deg,#f3f7ff,#e7eefb);color:var(--ink);min-height:100vh}
-  .wrap{max-width:640px;margin:0 auto;padding:20px 16px 60px}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:16px;
-    padding:22px;box-shadow:0 10px 30px -18px rgba(31,95,214,.5);margin-bottom:16px}
-  h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:0 0 12px;color:var(--blue-d)}
-  .sub{color:#6b7791;font-size:13px;margin:0 0 18px;line-height:1.5}
-  .badge{display:inline-block;background:var(--sky);color:var(--blue-d);
-    font-size:12px;padding:3px 10px;border-radius:999px;margin-bottom:10px;font-weight:700}
-  .badge.cat{background:#f0ecff;color:var(--purple)}
-  .badge.kipi{background:#e0f5f5;color:var(--kipi)}
-  .badge.event{background:#fff0e0;color:#c8791a}
-  label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px;color:#42506b}
-  input[type=text]{width:100%;padding:11px 13px;border:1px solid var(--line);
-    border-radius:10px;font-size:15px;background:#fff}
+  body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;
+    background-color:var(--cream);
+    background-image:radial-gradient(#d8ceb2 1.3px, transparent 1.4px);
+    background-size:22px 22px;color:var(--ink);min-height:100vh}
+  .wrap{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+  .ghead{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+  .ghead .logo{font-size:26px;line-height:1}
+  .ghead .title{font-size:18px;font-weight:800;color:var(--blue-d);letter-spacing:-.5px}
+  .ghead .tag{background:var(--yellow);border:2px solid var(--ink);border-radius:99px;padding:2px 9px;font-size:11px;font-weight:800}
+  .ghead .fun{margin-left:auto;background:#fff;border:2px solid var(--red);color:var(--red);border-radius:99px;padding:3px 10px;font-size:11px;font-weight:800}
+  .card{background:var(--paper);border:2.5px solid var(--ink);border-radius:18px;
+    padding:22px;box-shadow:4px 4px 0 var(--ink);margin-bottom:16px}
+  h1{font-size:24px;margin:0 0 4px;font-weight:800;color:var(--blue-d);letter-spacing:-.5px}
+  h2{font-size:17px;margin:0 0 12px;color:var(--ink);font-weight:800}
+  .sub{color:var(--mut);font-size:13px;margin:0 0 18px;line-height:1.55}
+  .badge{display:inline-block;background:#fff;color:var(--red);border:2px solid var(--red);
+    font-size:11px;padding:2px 10px;border-radius:999px;margin-bottom:10px;font-weight:800}
+  .badge.cat{color:var(--blue);border-color:var(--blue)}
+  .badge.kipi{color:var(--kipi);border-color:var(--kipi)}
+  .badge.event{color:#c8791a;border-color:#c8791a}
+  label{display:block;font-size:13px;font-weight:800;margin:12px 0 6px;color:var(--ink)}
+  input[type=text]{width:100%;padding:11px 13px;border:2.5px solid var(--ink);
+    border-radius:12px;font-size:15px;background:#fff;font-weight:600}
+  input[type=text]:focus{outline:none;box-shadow:2px 2px 0 var(--ink)}
   button{cursor:pointer;font-family:inherit}
-  .btn{background:var(--blue);color:#fff;border:0;border-radius:11px;
-    padding:13px 18px;font-size:15px;font-weight:700;width:100%;transition:.15s}
-  .btn:hover{background:var(--blue-d)} .btn:active{transform:translateY(1px)}
-  .btn.ghost{background:#fff;color:var(--blue-d);border:1.5px solid var(--blue)}
+  .btn{background:var(--yellow);color:var(--ink);border:2.5px solid var(--ink);border-radius:13px;
+    padding:13px 18px;font-size:15px;font-weight:800;width:100%;box-shadow:3px 3px 0 var(--ink);transition:.08s}
+  .btn:hover{background:var(--yellow-d)}
+  .btn:active{transform:translate(3px,3px);box-shadow:0 0 0 var(--ink)}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.blue{background:var(--blue);color:#fff}
   .choices{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-  .choice{text-align:left;background:#fff;border:1.5px solid var(--line);
-    border-radius:12px;padding:13px 15px;font-size:14.5px;transition:.12s;line-height:1.45}
-  .choice:hover{border-color:var(--blue);background:var(--sky)}
-  .choice .whisper{display:block;font-size:12px;color:#8a94a8;margin-top:4px;font-style:italic}
-  .prog{height:8px;background:#e3ebf9;border-radius:99px;overflow:hidden;margin:2px 0 16px}
-  .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),#4d88f0);width:0;transition:.3s}
-  .turnmeta{display:flex;justify-content:space-between;font-size:12px;color:#6b7791;margin-bottom:6px}
+  .choice{text-align:left;background:#fff;border:2.5px solid var(--ink);
+    border-radius:14px;padding:13px 15px;font-size:14.5px;transition:.08s;line-height:1.45;font-weight:600;box-shadow:2px 2px 0 var(--ink)}
+  .choice:hover{background:var(--yellow);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+  .choice .whisper{display:block;font-size:12px;color:var(--mut);margin-top:4px;font-style:italic;font-weight:500}
+  .prog{height:13px;background:#fff;border:2px solid var(--ink);border-radius:99px;overflow:hidden;margin:2px 0 16px}
+  .prog>i{display:block;height:100%;background:var(--yellow);width:0;transition:.3s}
+  .turnmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);margin-bottom:6px;font-weight:700}
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:6px}
   .radar{display:block;margin:4px auto 2px;width:100%;max-width:340px;height:auto}
   .hpmp{margin-top:10px}
-  .stat{font-size:12.5px}
-  .stat .bar{height:7px;background:#e8eefb;border-radius:99px;overflow:hidden;margin-top:3px}
+  .stat{font-size:12.5px;font-weight:700}
+  .stat .bar{height:9px;background:#fff;border:1.5px solid var(--ink);border-radius:99px;overflow:hidden;margin-top:3px}
   .stat .bar>i{display:block;height:100%;background:var(--blue)}
   .stat.hp .bar>i{background:var(--ok)} .stat.mp .bar>i{background:var(--gold)}
-  .fx{font-size:13px;margin-top:10px;padding:11px 13px;border-radius:9px;background:#f2f6ff;line-height:1.5}
-  .fx .rx{display:block;color:var(--purple);font-size:13px;margin-bottom:6px}
+  .fx{font-size:13px;margin-top:10px;padding:11px 13px;border-radius:11px;background:var(--sky);border:2px solid var(--ink);line-height:1.5;font-weight:600}
+  .fx .rx{display:block;color:var(--blue-d);font-size:13px;margin-bottom:6px}
   .fx b.up{color:var(--ok)} .fx b.dn{color:var(--bad)} .fx b.it{color:var(--pink)}
-  .charcard{background:linear-gradient(135deg,#20304d,#2d5bbf);color:#fff;border-radius:16px;
-    padding:22px 20px;margin:8px 0 16px;text-align:center}
-  .charcard .emoji{font-size:46px;line-height:1}
+  .charcard{background:var(--blue);color:#fff;border:2.5px solid var(--ink);border-radius:18px;
+    padding:22px 20px;margin:8px 0 16px;text-align:center;box-shadow:4px 4px 0 var(--ink)}
+  .charcard .emoji{font-size:48px;line-height:1}
   .charcard .cname{font-size:22px;font-weight:800;margin:8px 0 6px}
-  .charcard .cdesc{font-size:13.5px;opacity:.95;line-height:1.55}
-  .charcard .grade{display:inline-block;margin-top:12px;background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 16px;font-weight:800;font-size:15px}
+  .charcard .cdesc{font-size:13.5px;opacity:.96;line-height:1.55}
+  .charcard .grade{display:inline-block;margin-top:12px;background:var(--yellow);color:var(--ink);
+    border:2px solid var(--ink);border-radius:999px;padding:5px 16px;font-weight:800;font-size:15px}
   .traits{display:flex;flex-direction:column;gap:9px;margin:6px 0 2px}
-  .traxis{font-size:12px}
-  .traxis .lab{display:flex;justify-content:space-between;color:#6b7791;margin-bottom:3px}
+  .traxis{font-size:12px;font-weight:700}
+  .traxis .lab{display:flex;justify-content:space-between;color:var(--mut);margin-bottom:3px}
   .traxis .lab b{color:var(--ink)}
-  .trbar{position:relative;height:8px;background:#eef2fb;border-radius:99px}
-  .trbar .dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;
-    border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-  .insight{border-radius:13px;padding:14px 16px;margin:10px 0;line-height:1.55}
+  .trbar{position:relative;height:10px;background:#fff;border:2px solid var(--ink);border-radius:99px}
+  .trbar .dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;
+    border-radius:50%;background:var(--blue);border:2.5px solid var(--ink)}
+  .insight{border-radius:14px;padding:14px 16px;margin:10px 0;line-height:1.55;border:2px solid var(--ink)}
   .insight .h{font-size:12.5px;font-weight:800;margin-bottom:4px}
-  .insight.good{background:#eafaf1;border:1px solid #bfe8cf} .insight.good .h{color:var(--ok)}
-  .insight.like{background:#fdeef5;border:1px solid #f4cfe0} .insight.like .h{color:var(--pink)}
-  .insight.hard{background:#fdeeee;border:1px solid #f4cccc} .insight.hard .h{color:var(--bad)}
+  .insight.good{background:#d9f5e4} .insight.good .h{color:#0f7a3d}
+  .insight.like{background:#ffe1ee} .insight.like .h{color:#c02e68}
+  .insight.hard{background:#ffe0dc} .insight.hard .h{color:#c23a26}
   .insight .big{font-size:15px;font-weight:800;color:var(--ink)}
-  .insight .side{font-size:12.5px;color:#4a5468;margin-top:3px}
+  .insight .side{font-size:12.5px;color:#5a5347;margin-top:3px}
   table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:6px}
-  th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}
-  th{color:#6b7791;font-size:12px;font-weight:700}
-  tr.me{background:var(--sky);font-weight:800}
+  th,td{padding:8px 10px;text-align:left;border-bottom:2px solid var(--ink)}
+  th{color:var(--mut);font-size:12px;font-weight:800}
+  tr.me{background:var(--yellow);font-weight:800}
   .rank{font-weight:800;color:var(--blue-d);width:38px}
   .row2{display:flex;gap:10px;margin-top:10px}
   .row2 .btn{flex:1}
-  .muted{color:#8a94a8;font-size:12px;text-align:center;margin-top:14px}
-  .kv{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px dashed var(--line)}
+  .muted{color:var(--mut);font-size:12px;text-align:center;margin-top:14px;line-height:1.5}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1.5px dashed #cabfa4;font-weight:600}
   .dex{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
-  .dexcell{border:1px solid var(--line);border-radius:10px;padding:9px 6px;text-align:center;font-size:11.5px;background:#fff}
-  .dexcell.got{border-color:var(--blue);background:var(--sky);font-weight:700}
-  .dexcell .de{font-size:22px;line-height:1.1} .dexcell.miss{color:#b9c1d1}
+  .dexcell{border:2px solid var(--ink);border-radius:12px;padding:9px 6px;text-align:center;font-size:11.5px;background:#fff;box-shadow:2px 2px 0 var(--ink);font-weight:700}
+  .dexcell.got{background:var(--yellow)}
+  .dexcell .de{font-size:22px;line-height:1.1} .dexcell.miss{color:#b9b3a2;box-shadow:none;opacity:.75}
+  /* ---- 활력(통통 튀는 모션 + 반짝임) ---- */
+  @keyframes popIn{0%{opacity:0;transform:translateY(14px) scale(.98)}100%{opacity:1;transform:none}}
+  @keyframes popNum{0%{transform:scale(1)}45%{transform:scale(1.4)}100%{transform:scale(1)}}
+  @keyframes sparkle{0%,100%{opacity:.35;transform:scale(.75) rotate(-10deg)}50%{opacity:1;transform:scale(1.2) rotate(10deg)}}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  #app>.card{animation:popIn .28s cubic-bezier(.2,.9,.3,1.4) both}
+  #app>.card:nth-child(2){animation-delay:.07s}
+  #app>.card:nth-child(3){animation-delay:.14s}
+  .btn:hover{background:var(--yellow-d);transform:translate(-1px,-2px);box-shadow:5px 5px 0 var(--ink)}
+  .btn.blue:hover{background:var(--blue-d)}
+  .fx b{display:inline-block;animation:popNum .34s ease}
+  .spark{display:inline-block;animation:sparkle 1.4s ease-in-out infinite}
+  .ghead .logo{animation:bob 2.6s ease-in-out infinite}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  /* ---- 캐릭터 선택/표시 ---- */
+  .charpick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px}
+  .charopt{background:#fff;border:2.5px solid var(--ink);border-radius:14px;padding:9px 6px 8px;text-align:center;box-shadow:2px 2px 0 var(--ink);transition:.1s;cursor:pointer}
+  .charopt:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink);background:#fffbe9}
+  .charopt.on{background:var(--yellow);transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
+  .charopt .cvg{display:flex;justify-content:center;pointer-events:none}
+  .charopt .cnm{font-size:12px;font-weight:800;margin-top:3px;pointer-events:none}
+  .charopt .cln{font-size:10.5px;color:var(--mut);line-height:1.3;margin-top:1px;pointer-events:none}
+  .charrow{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:2px dashed #cabfa4}
+  .charrow .cnm{font-size:16px;font-weight:800}
+  .charrow .cln{font-size:12px;color:var(--mut);margin-top:1px}
+  .charcard .cavatar{display:inline-block;background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:5px 5px 0;margin-bottom:8px;line-height:0}
+  .charcard .cintro{font-size:12.5px;opacity:.92;margin-bottom:3px;font-weight:600}
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
+<div class="wrap">
+  <div class="ghead">
+    <span class="logo">🧑‍💼</span>
+    <span class="title">신입사원 메이커</span>
+    <span class="tag">20년 후의 나</span>
+    <span class="fun">재미율 100%</span>
+  </div>
+  <div id="app"></div>
+</div>
 
 <script>
 /* ============================================================
@@ -397,11 +444,13 @@ function buildTurns(seed){
 
 /* ---------- 상태 ---------- */
 let G=null;
+let chosenChar=0;
+function selectChar(i){ chosenChar=i; document.querySelectorAll('.charopt').forEach((el,j)=>el.classList.toggle('on',j===i)); }
 function newGame(nick,seed){
   const s={}; STAT_KEYS.forEach(k=>s[k]=START_STAT); s.hp=START_HPMP; s.mp=START_HPMP;
   const like={}; STAT_KEYS.forEach(k=>like[k]=0);
   G={nick,seed,stats:s,like,trait:{social:0,novelty:0,belonging:0},
-     turns:buildTurns(seed),t:0,burnout:0,startTime:Date.now(),log:[],painPick:null};
+     turns:buildTurns(seed),t:0,burnout:0,startTime:Date.now(),log:[],painPick:null,char:CHARS[chosenChar]};
 }
 
 /* ---------- 점수 + 등급 ---------- */
@@ -450,11 +499,13 @@ function screenStart(){
   const dex=loadDex(); const got=DEX_ORDER.filter(k=>dex[k]).length;
   el(`
   <div class="card">
-    <div class="badge">KIPI Playground · 프로토타입 v4</div>
-    <h1>신입사원 메이커: 20년 후의 나</h1>
-    <p class="sub">우리원 신입이 되어 12번의 선택을 한다.<br><b>내 강점 · 끌리는 일 · 힘든 이유</b>와 <b>일하는 성향</b>까지 알아보고, 나만의 캐릭터로 성장해요.</p>
+    <div class="badge">KIPI Playground · 프로토타입</div>
+    <h1>신입사원을 키워라, <span class="spark">✨</span><br>20년 후가 <span style="color:var(--red)">결정된다!</span></h1>
+    <p class="sub">우리원 신입이 되어 15번의 선택으로 쑥쑥 성장! 💪<br><b>내 강점 · 끌리는 일 · 힘든 이유</b>와 <b>일하는 성향</b>까지 알아보고, 나만의 캐릭터를 완성해요.</p>
     <label>닉네임</label>
     <input id="nick" type="text" maxlength="12" placeholder="예: 혜연" />
+    <label>내 캐릭터 고르기</label>
+    <div class="charpick">${CHARS.map((c,i)=>`<button type="button" class="charopt ${i===chosenChar?'on':''}" onclick="selectChar(${i})"><div class="cvg">${charSVG(c,72)}</div><div class="cnm">${c.tag}</div><div class="cln">${c.line}</div></button>`).join("")}</div>
     <label>대회 코드 <span style="font-weight:400;color:#8a94a8">(있으면 입력 · 없으면 매번 다른 문항)</span></label>
     <input id="seed" type="text" maxlength="24" placeholder="대회 날 받은 코드가 있으면 입력" />
     <div style="height:14px"></div>
@@ -506,6 +557,58 @@ function drawRadar(id,s){
   for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,v=Math.min(MAX,gv(STAT_KEYS[i]))/MAX,r=R*v,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
     ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='#1f5fd6';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}
 }
+/* ---------- 캐릭터 SVG (코드로 그리는 아바타, 표정·옷 변형 가능) ---------- */
+const CHARS=[
+  {id:0,tag:"🔥 열정 만렙형",skin:"#ffe0c2",hair:"#2a2320",hairStyle:"short",suit:"#2f6fed",tie:"#e8503a",face:"cheer",line:"출근 첫날부터 눈이 반짝반짝"},
+  {id:1,tag:"☀️ 긍정 에너지형",skin:"#ffe4c4",hair:"#8a5a2b",hairStyle:"wave",suit:"#f5a623",tie:"#2f6fed",face:"smile",line:"어디서든 분위기 담당 일진"},
+  {id:2,tag:"🧊 차분 분석형",skin:"#ffe0c2",hair:"#1c1a17",hairStyle:"neat",glasses:true,suit:"#4a5568",tie:"#2f6fed",face:"calm",line:"말은 적지만 자료는 완벽"},
+  {id:3,tag:"🎨 자유 영혼형",skin:"#ffe4c4",hair:"#7a5cf0",hairStyle:"pony",suit:"#12a594",tie:"#ffd23f",face:"wink",line:"남들과 다른 각도로 세상을 봐"},
+];
+function charSVG(c, size, faceOverride){
+  size=size||110;
+  const S="#1c1a17";
+  const face=faceOverride||c.face||"smile";
+  const hairMap={
+    short:`<path d="M30 56 Q30 22 60 22 Q90 22 90 56 Q86 41 78 42 Q80 31 60 31 Q40 31 42 42 Q34 41 30 56Z" fill="${c.hair}" stroke="${S}" stroke-width="3" stroke-linejoin="round"/><path d="M42 43 Q52 34 60 40 Q68 34 78 43 Q69 44 60 43 Q51 44 42 43Z" fill="${c.hair}"/>`,
+    wave:`<path d="M27 62 Q24 22 60 20 Q96 22 93 62 Q92 45 84 46 Q88 31 60 30 Q32 31 36 46 Q28 45 27 62Z" fill="${c.hair}" stroke="${S}" stroke-width="3" stroke-linejoin="round"/><path d="M40 45 Q50 35 60 41 Q70 35 80 45 Q69 46 60 45 Q51 46 40 45Z" fill="${c.hair}"/>`,
+    neat:`<path d="M31 54 Q31 24 60 24 Q89 24 89 54 Q82 41 74 42 Q78 33 60 32 Q42 33 46 42 Q38 41 31 54Z" fill="${c.hair}" stroke="${S}" stroke-width="3" stroke-linejoin="round"/>`,
+    pony:`<path d="M84 45 Q107 51 100 82 Q96 63 82 59Z" fill="${c.hair}" stroke="${S}" stroke-width="2.5" stroke-linejoin="round"/><path d="M30 56 Q30 22 60 22 Q90 22 90 56 Q86 41 78 42 Q80 31 60 31 Q40 31 42 42 Q34 41 30 56Z" fill="${c.hair}" stroke="${S}" stroke-width="3" stroke-linejoin="round"/><path d="M42 43 Q52 34 60 40 Q68 34 78 43 Q69 44 60 43 Q51 44 42 43Z" fill="${c.hair}"/>`
+  };
+  const bigEye=(x)=>`<ellipse cx="${x}" cy="59" rx="4.2" ry="5.4" fill="${S}"/><circle cx="${x+1.5}" cy="56.7" r="1.7" fill="#fff"/>`;
+  let eyesG,mouthG,browG="";
+  if(face==="surprised"){
+    eyesG=`<circle cx="50" cy="59" r="5.4" fill="#fff" stroke="${S}" stroke-width="2"/><circle cx="50" cy="59" r="2.7" fill="${S}"/><circle cx="70" cy="59" r="5.4" fill="#fff" stroke="${S}" stroke-width="2"/><circle cx="70" cy="59" r="2.7" fill="${S}"/>`;
+    mouthG=`<ellipse cx="60" cy="73" rx="4.3" ry="5.4" fill="#8a3b2e" stroke="${S}" stroke-width="2"/>`;
+    browG=`<path d="M43 47 Q50 43 56 46" stroke="${S}" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M64 46 Q70 43 77 47" stroke="${S}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  }else if(face==="wink"){
+    eyesG=bigEye(50)+`<path d="M65 60 Q70 55 75 60" fill="none" stroke="${S}" stroke-width="2.8" stroke-linecap="round"/>`;
+    mouthG=`<path d="M51 69 Q60 78 69 69" fill="none" stroke="${S}" stroke-width="2.8" stroke-linecap="round"/>`;
+  }else if(face==="calm"){
+    eyesG=bigEye(50)+bigEye(70);
+    mouthG=`<path d="M53 71 L67 71" stroke="${S}" stroke-width="2.8" stroke-linecap="round"/>`;
+  }else if(face==="cheer"){
+    eyesG=`<path d="M45 60 Q50 54 55 60" fill="none" stroke="${S}" stroke-width="2.8" stroke-linecap="round"/><path d="M65 60 Q70 54 75 60" fill="none" stroke="${S}" stroke-width="2.8" stroke-linecap="round"/>`;
+    mouthG=`<path d="M49 68 Q60 82 71 68 Z" fill="#e05a45" stroke="${S}" stroke-width="2" stroke-linejoin="round"/><path d="M50 68 Q60 71 70 68 Z" fill="#fff"/>`;
+  }else{
+    eyesG=bigEye(50)+bigEye(70);
+    mouthG=`<path d="M51 69 Q60 78 69 69" fill="none" stroke="${S}" stroke-width="2.8" stroke-linecap="round"/>`;
+  }
+  const glasses=c.glasses?`<rect x="41.5" y="53" width="17" height="12.5" rx="4" fill="none" stroke="${S}" stroke-width="2"/><rect x="61.5" y="53" width="17" height="12.5" rx="4" fill="none" stroke="${S}" stroke-width="2"/><line x1="58.5" y1="58" x2="61.5" y2="58" stroke="${S}" stroke-width="2"/>`:"";
+  return `<svg viewBox="0 0 120 134" width="${size}" height="${Math.round(size*1.12)}" xmlns="http://www.w3.org/2000/svg">`
+    +`<path d="M22 134 Q22 98 44 92 L60 101 L76 92 Q98 98 98 134 Z" fill="${c.suit}" stroke="${S}" stroke-width="3" stroke-linejoin="round"/>`
+    +`<path d="M52 93 L60 107 L68 93 L64 90 L56 90 Z" fill="#fdfdfd" stroke="${S}" stroke-width="2" stroke-linejoin="round"/>`
+    +`<path d="M44 92 L56 90 L60 101 Z" fill="${c.suit}" stroke="${S}" stroke-width="2" stroke-linejoin="round"/><path d="M76 92 L64 90 L60 101 Z" fill="${c.suit}" stroke="${S}" stroke-width="2" stroke-linejoin="round"/>`
+    +`<path d="M57 95 L63 95 L61 112 L59 112 Z" fill="${c.tie}" stroke="${S}" stroke-width="1.5" stroke-linejoin="round"/>`
+    +`<path d="M53 82 Q54 92 60 92 Q66 92 67 82Z" fill="${c.skin}" stroke="${S}" stroke-width="2.5"/>`
+    +`<circle cx="30" cy="61" r="5" fill="${c.skin}" stroke="${S}" stroke-width="2"/><circle cx="90" cy="61" r="5" fill="${c.skin}" stroke="${S}" stroke-width="2"/>`
+    +`<circle cx="60" cy="57" r="31" fill="${c.skin}" stroke="${S}" stroke-width="3"/>`
+    +hairMap[c.hairStyle||"short"]
+    +browG
+    +`<circle cx="43" cy="67" r="5" fill="#ff9db0" opacity=".55"/><circle cx="77" cy="67" r="5" fill="#ff9db0" opacity=".55"/>`
+    +eyesG+glasses+mouthG
+    +`<rect x="62" y="101" width="11" height="14" rx="2" fill="#fff" stroke="${S}" stroke-width="1.5"/><line x1="64.5" y1="105" x2="70.5" y2="105" stroke="${c.suit}" stroke-width="1.5"/><line x1="64.5" y1="108.5" x2="69" y2="108.5" stroke="#cfcfcf" stroke-width="1.2"/>`
+    +`</svg>`;
+}
 function bClass(g){return g==="kipi"?"kipi":(g==="event"?"event":"cat");}
 
 function screenTurn(){
@@ -520,7 +623,9 @@ function screenTurn(){
     <div class="choices">${c.opts.map((o,i)=>`<button class="choice" onclick="choose(${i})">${o.t}
       ${o.whisper?`<span class="whisper">“${o.whisper}”</span>`:``}</button>`).join("")}</div>
   </div>
-  <div class="card"><h2>능력치</h2>
+  <div class="card">
+    <div class="charrow">${charSVG(G.char,64)}<div><div class="cnm">${G.nick}</div><div class="cln">${G.char.tag}</div></div></div>
+    <h2>능력치</h2>
     <canvas id="radarTurn" width="620" height="400" class="radar"></canvas>
     <div class="stats hpmp">${statHpMp(G.stats)}</div></div>`);
   drawRadar("radarTurn", G.stats);
@@ -591,10 +696,10 @@ function screenResult(){
 
   el(`
   <div class="card">
-    <div class="badge">20년 후 · 나의 캐릭터</div>
+    <div class="badge">📋 ${G.nick}의 20년 후 배치 결과</div>
     <div class="charcard">
-      <div class="emoji">${ch.e}</div>
-      <div class="cname">${ch.name}</div>
+      <div class="cintro">입사 20년 차 — 마침내 발표된 배치는…</div>
+      <div class="cname">${ch.e} ${ch.name}!</div>
       <div class="cdesc">${ch.desc}</div>
       <div class="grade">${grade}등급 · ${score.toLocaleString()}점</div>
     </div>
@@ -617,18 +722,16 @@ function screenResult(){
 
     <div class="kv"><span>번아웃(멘탈·체력 소진)</span><b>${G.burnout}회</b></div>
     <div class="kv"><span>소요 시간</span><b>${(time/1000).toFixed(1)}초</b></div>
-    <h2 style="margin-top:16px">능력치 레이더</h2>
+    <div class="charrow" style="margin-top:16px">${charSVG(G.char,62,"cheer")}<div><div class="cnm">최종 능력치</div><div class="cln">20년간의 선택이 만든 ${G.nick}의 성적표</div></div></div>
     <canvas id="radarResult" width="620" height="400" class="radar"></canvas>
     <div class="stats hpmp">${statHpMp(s)}</div>
     <div class="insight" style="background:#eef4ff;border:1px solid #d6e0f2;margin-top:10px">
       <div class="h" style="color:var(--blue-d)">${es.e} 에너지 운용 — ${es.name}</div>
       <div style="font-size:13px;color:#4a5468">${es.desc}</div>
     </div>
-    <div class="row2">
-      <button class="btn ghost" onclick="screenStart()">처음으로</button>
-      <button class="btn ghost" onclick="start2rand()">🎲 새 문항</button>
-      <button class="btn" onclick="start2()">재도전 ↻</button>
-    </div>
+    <button class="btn" onclick="screenStart()">🔄 다른 신입으로 다시 키우기</button>
+    <div style="height:9px"></div>
+    <button class="btn ghost" onclick="start2()">↻ 같은 조건으로 재도전</button>
   </div>
 
   <div class="card">
