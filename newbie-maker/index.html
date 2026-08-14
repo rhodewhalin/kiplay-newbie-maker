@@ -40,6 +40,8 @@
   .prog>i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),#4d88f0);width:0;transition:.3s}
   .turnmeta{display:flex;justify-content:space-between;font-size:12px;color:#6b7791;margin-bottom:6px}
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px;margin-top:6px}
+  .radar{display:block;margin:4px auto 2px;width:100%;max-width:340px;height:auto}
+  .hpmp{margin-top:10px}
   .stat{font-size:12.5px}
   .stat .bar{height:7px;background:#e8eefb;border-radius:99px;overflow:hidden;margin-top:3px}
   .stat .bar>i{display:block;height:100%;background:var(--blue)}
@@ -98,7 +100,7 @@
    6) 문항 42개(kipi13·psych20·event9), 추가문항 4 + RFID 반영
    ============================================================ */
 
-const STAT_KEYS = ["기획력","소통력","행정력","기술이해도","AI이해도","조직이해도","창의력"];
+const STAT_KEYS = ["기획력","소통력","행정력","디지털","조직이해도","창의력"];
 const START_STAT = 25, START_HPMP = 100, TURNS = 12;
 const PICK = { kipi:5, psych:5, event:2 };
 
@@ -106,8 +108,7 @@ const FIT = {
   기획력:{job:"전략·사업기획", line:"큰 그림을 그리고 방향을 잡는 일"},
   소통력:{job:"대외협력·상담·교육", line:"사람과 기관 사이를 연결하는 일"},
   행정력:{job:"기획조정·예산·규정", line:"절차와 기준을 단단히 지키는 일"},
-  기술이해도:{job:"특허넷·정보시스템", line:"시스템과 데이터를 다루는 일"},
-  AI이해도:{job:"AI·디지털전환", line:"새 기술로 일하는 방식을 바꾸는 일"},
+  디지털:{job:"특허넷·AI·디지털전환", line:"시스템·데이터·AI로 일하는 방식을 다루는 일"},
   조직이해도:{job:"기획조정·국제협력", line:"조직과 관계기관을 조율하는 일"},
   창의력:{job:"신사업·서비스기획", line:"아무도 안 한 방식을 시도하는 일"},
 };
@@ -116,19 +117,17 @@ const PAIN = {
   기획력:"일의 우선순위를 못 잡아 늘 급한 불만 끄고 있어요.",
   소통력:"혼자 끌어안고 말을 안 해서 더 지치는 스타일이에요.",
   행정력:"규정·절차가 자꾸 발목을 잡는 것처럼 느껴져요.",
-  기술이해도:"새 시스템만 보면 머리가 지끈거려요.",
-  AI이해도:"새 도구 익히라는 말이 제일 큰 스트레스예요.",
+  디지털:"새 시스템·AI 도구 익히라는 말이 제일 큰 스트레스예요.",
   조직이해도:"이 일을 왜 하는지 몰라서 의욕이 안 나요.",
   창의력:"늘 하던 방식만 반복하는 게 답답해요.",
 };
 
-/* ---------- 캐릭터 (강점 base 7 + 특수 2) ---------- */
+/* ---------- 캐릭터 (강점 base 6 + 특수 2) ---------- */
 const BASE_CHAR = {
   기획력:{e:"🧭",name:"전략 기획가",desc:"판을 짜고 방향을 잡는 사람. 큰 그림이 보이면 손이 근질근질해요."},
   소통력:{e:"🤝",name:"조율의 커넥터",desc:"사람과 부서를 잇는 사람. 당신이 있으면 이야기가 굴러갑니다."},
   행정력:{e:"🛡️",name:"규정의 수호자",desc:"절차와 기준으로 조직을 지키는 사람. 흔들려도 원칙은 안 흔들려요."},
-  기술이해도:{e:"🔧",name:"시스템 장인",desc:"시스템과 데이터로 말하는 사람. 복잡할수록 눈이 반짝입니다."},
-  AI이해도:{e:"🤖",name:"AI 개척자",desc:"새 기술로 일하는 방식을 바꾸는 사람. 미래가 취미이자 특기예요."},
+  디지털:{e:"🤖",name:"디지털 개척자",desc:"시스템·데이터·AI로 일하는 방식을 바꾸는 사람. 복잡할수록 눈이 반짝여요."},
   조직이해도:{e:"🧩",name:"조직의 조율자",desc:"전체 흐름을 읽고 사이를 메우는 사람. 조직이 잘 굴러가면 뿌듯하죠."},
   창의력:{e:"💡",name:"아이디어 뱅크",desc:"아무도 안 한 방식을 던지는 사람. 지루한 건 못 참아요."},
 };
@@ -138,7 +137,7 @@ const SPECIAL = {
   균형:{e:"⚖️",name:"균형 잡힌 만능 실무가",
     desc:"어느 하나 빠지지 않는 올라운더. 어디에 놔둬도 제 몫을 해내는 사람이에요."},
 };
-const DEX_ORDER = ["기획력","소통력","행정력","기술이해도","AI이해도","조직이해도","창의력","균형","한량"];
+const DEX_ORDER = ["기획력","소통력","행정력","디지털","조직이해도","창의력","균형","한량"];
 /* 성향 프리픽스 (가장 강한 축) */
 function traitPrefix(tr){
   const cand=[
@@ -157,48 +156,48 @@ function traitPrefix(tr){
 const Q = [
 /* ===== KIPI 현안 13 (전부 strength) ===== */
 {g:"kipi",m:"str",cat:"KIPRIS 검색서비스",q:"[KIPRIS] 국민이 쓰는 특허검색 서비스에 새 기능을 넣는다면?",opts:[
-  {t:"AI 유사특허 추천 기능",eff:{AI이해도:3,창의력:1},tr:{novelty:1},whisper:"똑똑하게"},
+  {t:"AI 유사특허 추천 기능",eff:{디지털:3,창의력:1},tr:{novelty:1},whisper:"똑똑하게"},
   {t:"검색 결과 화면을 더 쉽게",eff:{기획력:2,소통력:1},whisper:"쉬운 게 최고"},
-  {t:"데이터 정확도·속도 개선",eff:{기술이해도:3},tr:{social:-1},whisper:"기본이 튼튼해야"},
+  {t:"데이터 정확도·속도 개선",eff:{디지털:3},tr:{social:-1},whisper:"기본이 튼튼해야"},
   {t:"초보자 가이드·상담 연계",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"친절하게"}]},
 {g:"kipi",m:"str",cat:"상표 이미지 검색 AI",q:"[상표 이미지 검색] 이미지로 유사상표를 찾는 AI를 도입한다. 당신의 관심사는?",opts:[
-  {t:"모델 정확도와 학습데이터",eff:{AI이해도:3,기술이해도:1},tr:{social:-1},whisper:"성능이 핵심"},
+  {t:"모델 정확도와 학습데이터",eff:{디지털:4},tr:{social:-1},whisper:"성능이 핵심"},
   {t:"사용자에게 어떻게 보여줄지",eff:{기획력:2,창의력:1},whisper:"경험이 중요"},
   {t:"오탐 시 민원·책임 범위",eff:{행정력:3},tr:{novelty:-1},whisper:"리스크부터"},
   {t:"현업 담당자 의견 수렴",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"현장을 알아야"}]},
 {g:"kipi",m:"str",cat:"개도국 ODA",q:"[개도국 ODA] 베트남에 특허행정시스템을 수출하는 사업. 당신의 역할은?",opts:[
   {t:"현지 기관과 요구사항 조율",eff:{소통력:3,조직이해도:1},tr:{social:1},whisper:"통하였느냐"},
-  {t:"시스템 설계·기술 이전",eff:{기술이해도:3},tr:{social:-1},whisper:"기술로 승부"},
+  {t:"시스템 설계·기술 이전",eff:{디지털:3},tr:{social:-1},whisper:"기술로 승부"},
   {t:"사업계획·예산·일정 관리",eff:{기획력:2,행정력:1},whisper:"판을 짠다"},
   {t:"현지에 맞는 새 모델 제안",eff:{창의력:3},tr:{novelty:1},whisper:"K-특허의 힘"}]},
 {g:"kipi",m:"str",cat:"특허 영문초록(KPA)",q:"[특허영문초록·KPA] 사람이 하던 번역·요약을 AI 모델로 바꾸라는데?",opts:[
-  {t:"AI 모델 성능부터 검증",eff:{AI이해도:3,기술이해도:1},whisper:"믿을 만한지 봐야"},
+  {t:"AI 모델 성능부터 검증",eff:{디지털:4},whisper:"믿을 만한지 봐야"},
   {t:"사람+AI 협업 프로세스 설계",eff:{기획력:2,창의력:1},tr:{novelty:1},whisper:"공존이 답"},
   {t:"품질·오류 관리 기준 마련",eff:{행정력:3},tr:{novelty:-1},whisper:"품질이 생명"},
   {t:"기존 담당자 우려부터 청취",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"사람이 먼저"}]},
 {g:"kipi",m:"str",cat:"PCT 국제출원 번역",q:"[PCT 국제출원 번역] 국제조사보고서 한영 번역, 마감이 촉박하다.",opts:[
   {t:"쌓아둔 용어집·템플릿으로 일사천리로 쳐낸다",eff:{행정력:2,기획력:1},tr:{novelty:-1},whisper:"미리 정리해둔 보람이 있네"},
-  {t:"AI 초벌을 최대한 뽑고 감수에 집중한다",eff:{AI이해도:2,기술이해도:1},tr:{novelty:1},whisper:"기계가 할 건 기계가, 난 다듬기"},
+  {t:"AI 초벌을 최대한 뽑고 감수에 집중한다",eff:{디지털:3},tr:{novelty:1},whisper:"기계가 할 건 기계가, 난 다듬기"},
   {t:"검수 분담을 동료와 조율",eff:{소통력:3},tr:{social:1},whisper:"같이 하면 빨라"}]},
 {g:"kipi",m:"str",cat:"특허고객상담센터",q:"[특허고객상담센터] 같은 항의를 30분째 반복하는 민원인. 당신은?",opts:[
   {t:"끝까지 공감하며 응대",eff:{소통력:3},mp:-6,tr:{social:1},whisper:"감정노동 만렙…"},
   {t:"매뉴얼대로 선을 지킨다",eff:{행정력:3},tr:{novelty:-1},whisper:"규정이 나를 지킨다"},
   {t:"반복 민원 대응 스크립트를 만든다",eff:{기획력:2,창의력:1},whisper:"시스템으로 해결"}]},
 {g:"kipi",m:"str",cat:"차세대 특허넷",q:"[차세대 특허넷] 전국이 쓰는 특허 시스템을 새로 만든다. 가장 신경 쓰는 건?",opts:[
-  {t:"안정성·장애 대응",eff:{기술이해도:3,행정력:1},tr:{novelty:-1},whisper:"무중단이 생명"},
+  {t:"안정성·장애 대응",eff:{디지털:3,행정력:1},tr:{novelty:-1},whisper:"무중단이 생명"},
   {t:"사용자 편의·화면 설계",eff:{기획력:2,소통력:1},whisper:"쓰기 쉬워야"},
-  {t:"새 기술·AI 접목",eff:{AI이해도:2,창의력:1},tr:{novelty:1},whisper:"기왕이면 미래형"},
-  {t:"국제표준 호환성",eff:{조직이해도:2,기술이해도:1},whisper:"글로벌 기준"}]},
+  {t:"새 기술·AI 접목",eff:{디지털:2,창의력:1},tr:{novelty:1},whisper:"기왕이면 미래형"},
+  {t:"국제표준 호환성",eff:{조직이해도:2,디지털:1},whisper:"글로벌 기준"}]},
 {g:"kipi",m:"str",cat:"국제표준(WIPO·PLT)",q:"[국제표준] 특허법조약(PLT) 가입, WIPO 시스템과 연동해야 한다.",opts:[
   {t:"국제 규정·조약을 파고든다",eff:{행정력:2,조직이해도:2},tr:{social:-1},whisper:"국제법 덕후"},
-  {t:"시스템 연동 기술을 검토",eff:{기술이해도:3},whisper:"연결이 관건"},
+  {t:"시스템 연동 기술을 검토",eff:{디지털:3},whisper:"연결이 관건"},
   {t:"관계기관과 협의를 주도",eff:{소통력:3},tr:{social:1},whisper:"합을 맞춰야"}]},
 {g:"kipi",m:"str",cat:"경영평가 TF",q:"[경영평가 TF] 우리원 경영평가 대응팀에 차출됐다. 당신의 무기는?",opts:[
   {t:"실적을 스토리로 구조화",eff:{기획력:3},whisper:"편집의 마술"},
   {t:"부서 간 자료를 조율",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"취합이 반이다"},
-  {t:"근거 데이터·지표 관리",eff:{행정력:2,기술이해도:1},whisper:"숫자로 증명"}]},
+  {t:"근거 데이터·지표 관리",eff:{행정력:2,디지털:1},whisper:"숫자로 증명"}]},
 {g:"kipi",m:"str",cat:"AI 대민 챗봇",q:"[AI 대민 챗봇] 민원 응대 챗봇을 개선하라. 무엇부터?",opts:[
-  {t:"답변 정확도·최신화",eff:{AI이해도:2,행정력:1},whisper:"틀리면 큰일"},
+  {t:"답변 정확도·최신화",eff:{디지털:2,행정력:1},whisper:"틀리면 큰일"},
   {t:"대화 흐름·사용성",eff:{기획력:2,창의력:1},tr:{novelty:1},whisper:"자연스럽게"},
   {t:"상담사 업무 경감 효과",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"동료를 살리자"}]},
 {g:"kipi",m:"str",cat:"글로벌 창업지원",q:"[글로벌 창업지원] 해외 진출 창업기업을 돕는 행사를 맡았다. 당신의 역할은?",opts:[
@@ -206,19 +205,19 @@ const Q = [
   {t:"행사 기획·운영",eff:{기획력:2,행정력:1},whisper:"진행은 내가"},
   {t:"새로운 지원 모델 발굴",eff:{창의력:3},tr:{novelty:1},whisper:"판을 바꾸자"}]},
 {g:"kipi",m:"str",cat:"특허기술 분석·활용",q:"[특허기술 분석] 기업에 유망 특허기술을 분석·제공한다. 당신의 접근은?",opts:[
-  {t:"데이터로 기술 트렌드 분석",eff:{기술이해도:2,AI이해도:2},tr:{social:-1},whisper:"데이터가 말해줘"},
+  {t:"데이터로 기술 트렌드 분석",eff:{디지털:4},tr:{social:-1},whisper:"데이터가 말해줘"},
   {t:"기업 니즈를 듣고 매칭",eff:{소통력:3},tr:{social:1},whisper:"수요부터 파악"},
   {t:"분석 보고서로 정리",eff:{기획력:2,행정력:1},whisper:"문서가 자산"}]},
 {g:"kipi",m:"str",cat:"기록물 디지털 전환",q:"[기록물 디지털화] 수기(손으로 쓴) 기록물을 RFID(무선인식 전자태그) 기반 디지털로 바꾼다. 당신은?",opts:[
   {t:"분류체계·표준부터 정비",eff:{행정력:2,기획력:1},tr:{novelty:-1},whisper:"기준이 먼저"},
-  {t:"시스템·태그 기술 검토",eff:{기술이해도:3},whisper:"기술로 편하게"},
+  {t:"시스템·태그 기술 검토",eff:{디지털:3},whisper:"기술로 편하게"},
   {t:"현업 불편을 줄이는 방향",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"쓰는 사람 입장"}]},
 
 /* ===== 성향 20 ===== */
 {g:"psych",m:"int",cat:"이동 판타지",q:"요즘 업무가 지긋지긋하다. 부서 이동 공고가 떴다. 가장 끌리는 곳은?",opts:[
   {t:"새로운 걸 기획하는 부서",like:{기획력:1,창의력:1},tr:{novelty:1},whisper:"일단 새로 시작하고 싶어"},
   {t:"사람들과 부대끼는 대외 부서",like:{소통력:1,조직이해도:1},tr:{social:1},whisper:"난 사람이 좋아"},
-  {t:"데이터·시스템 다루는 부서",like:{기술이해도:1},tr:{social:-1},whisper:"혼자 몰입할 수 있잖아"},
+  {t:"데이터·시스템 다루는 부서",like:{디지털:1},tr:{social:-1},whisper:"혼자 몰입할 수 있잖아"},
   {t:"규정·예산 안정적인 부서",like:{행정력:1},tr:{novelty:-1},whisper:"예측 가능한 게 최고야"}]},
 {g:"psych",m:"str",cat:"관계 스트레스",q:"옆자리 동료와 일하는 방식이 너무 안 맞는다. 당신의 선택은?",opts:[
   {t:"솔직하게 대화로 조율한다",eff:{소통력:4},mp:2,tr:{social:1},whisper:"동료: 말해줘서 고마워"},
@@ -233,17 +232,17 @@ const Q = [
 {g:"psych",m:"str",cat:"적성 발견",q:"새 프로젝트가 시작됐다. 팀이 당신에게 기대하는 역할은?",opts:[
   {t:"전체 그림과 일정을 짜는 사람",eff:{기획력:3,조직이해도:1},whisper:"판을 짜는 게 재밌어"},
   {t:"관계기관·팀을 조율하는 사람",eff:{소통력:3,조직이해도:1},tr:{social:1},whisper:"중간에서 연결하는 게 나야"},
-  {t:"데이터로 근거를 만드는 사람",eff:{기술이해도:3,기획력:1},tr:{social:-1},whisper:"숫자는 거짓말 안 하지"},
-  {t:"새 방식을 실험하는 사람",eff:{창의력:3,AI이해도:1},tr:{novelty:1},whisper:"남들 안 하는 거 해보자"}]},
+  {t:"데이터로 근거를 만드는 사람",eff:{디지털:3,기획력:1},tr:{social:-1},whisper:"숫자는 거짓말 안 하지"},
+  {t:"새 방식을 실험하는 사람",eff:{창의력:3,디지털:1},tr:{novelty:1},whisper:"남들 안 하는 거 해보자"}]},
 {g:"psych",m:"int",cat:"관리자의 길",q:"부서장이 \"자넨 나중에 관리자감\"이라 한다. 어떤 리더가 되고 싶나?",opts:[
   {t:"전체 흐름을 읽는 전략형",like:{조직이해도:1,기획력:1},whisper:"큰 그림을 보는 사람"},
   {t:"팀원 마음을 챙기는 소통형",like:{소통력:1,조직이해도:1},mp:2,tr:{social:1},whisper:"사람이 먼저다"},
-  {t:"시스템으로 일하게 만드는 형",like:{기술이해도:1,행정력:1},whisper:"체계가 답이다"},
-  {t:"변화를 이끄는 혁신형",like:{창의력:1,AI이해도:1},tr:{novelty:1},whisper:"바꿔야 산다"}]},
+  {t:"시스템으로 일하게 만드는 형",like:{디지털:1,행정력:1},whisper:"체계가 답이다"},
+  {t:"변화를 이끄는 혁신형",like:{창의력:1,디지털:1},tr:{novelty:1},whisper:"바꿔야 산다"}]},
 {g:"psych",m:"str",cat:"적성 발견",q:"칭찬을 들으면 가장 뿌듯한 순간은?",opts:[
   {t:"\"기획안이 깔끔하네\"",eff:{기획력:4},whisper:"구조 짜는 게 좋아"},
   {t:"\"자네 덕에 얘기가 잘 풀렸어\"",eff:{소통력:4},tr:{social:1},whisper:"연결하는 게 좋아"},
-  {t:"\"이 시스템 자네가 만들었어?\"",eff:{기술이해도:4},tr:{social:-1},whisper:"만드는 게 좋아"},
+  {t:"\"이 시스템 자네가 만들었어?\"",eff:{디지털:4},tr:{social:-1},whisper:"만드는 게 좋아"},
   {t:"\"그런 생각을 어떻게 했어?\"",eff:{창의력:4},tr:{novelty:1},whisper:"새로운 게 좋아"}]},
 {g:"psych",m:"stress",cat:"번아웃",q:"연차를 쓰고 싶다. 가장 큰 이유는?",opts:[
   {t:"밀린 일 생각에 머리가 꽉 참",mp:-4,whisper:"쉬어도 쉬는 게 아냐"},
@@ -258,7 +257,7 @@ const Q = [
 {g:"psych",m:"int",cat:"성장",q:"자기계발 지원금이 나왔다. 어디에 쓸까?",opts:[
   {t:"기획·보고서 작성 강의",like:{기획력:1},whisper:"기본기부터"},
   {t:"협상·커뮤니케이션 워크숍",like:{소통력:1},tr:{social:1},whisper:"사람 다루는 법"},
-  {t:"데이터·AI 실무 과정",like:{기술이해도:1,AI이해도:1},whisper:"시대를 따라가자"},
+  {t:"데이터·AI 실무 과정",like:{디지털:2},whisper:"시대를 따라가자"},
   {t:"새 분야 탐색 세미나",like:{창의력:1,조직이해도:1},tr:{novelty:1},whisper:"시야를 넓히자"}]},
 {g:"psych",m:"str",cat:"이동 판타지",q:"순환근무로 완전히 낯선 부서에 발령됐다. 첫 마음가짐은?",opts:[
   {t:"새 업무를 적극적으로 파고든다",eff:{조직이해도:3,창의력:1},mp:-3,tr:{belonging:1,novelty:1},whisper:"어차피 할 거 제대로"},
@@ -267,30 +266,30 @@ const Q = [
 {g:"psych",m:"str",cat:"일하는 방식",q:"큰 업무가 떨어졌다. 가장 먼저 하는 일은?",opts:[
   {t:"목표와 범위부터 정의한다",eff:{기획력:3},whisper:"방향부터 잡자"},
   {t:"관련자에게 상황을 묻는다",eff:{소통력:3},tr:{social:1},whisper:"현황 파악이 먼저"},
-  {t:"과거 자료·데이터를 뒤진다",eff:{기술이해도:2,행정력:1},tr:{social:-1},whisper:"선례가 있겠지"},
+  {t:"과거 자료·데이터를 뒤진다",eff:{디지털:2,행정력:1},tr:{social:-1},whisper:"선례가 있겠지"},
   {t:"일단 초안을 만들어 본다",eff:{창의력:3},tr:{novelty:1},whisper:"만들면서 다듬자"}]},
 {g:"psych",m:"int",cat:"가치관",q:"일에서 가장 중요하게 여기는 것은?",opts:[
   {t:"성과와 완성도",like:{기획력:1,행정력:1},whisper:"제대로 해내는 것"},
   {t:"함께 일하는 사람들",like:{소통력:1,조직이해도:1},tr:{social:1},whisper:"분위기가 중요해"},
-  {t:"배우고 성장하는 것",like:{AI이해도:1,창의력:1},tr:{novelty:1},whisper:"어제보다 나은 나"},
+  {t:"배우고 성장하는 것",like:{디지털:1,창의력:1},tr:{novelty:1},whisper:"어제보다 나은 나"},
   {t:"안정과 예측 가능성",like:{행정력:1,조직이해도:1},tr:{novelty:-1},whisper:"흔들리지 않는 게 좋아"}]},
 {g:"psych",m:"str",cat:"스트레스 대처",q:"압박이 극에 달한 날, 나를 버티게 하는 건?",opts:[
   {t:"할 일을 쪼개 하나씩 지운다",eff:{기획력:3},mp:2,whisper:"체크리스트가 힘이야"},
   {t:"동료와 잠깐 수다 떤다",eff:{소통력:2},mp:5,tr:{social:1},whisper:"말하면 좀 풀려"},
-  {t:"이어폰 끼고 몰입한다",eff:{기술이해도:2},mp:2,tr:{social:-1},whisper:"세상과 잠시 단절"},
+  {t:"이어폰 끼고 몰입한다",eff:{디지털:2},mp:2,tr:{social:-1},whisper:"세상과 잠시 단절"},
   {t:"'퇴근하면 끝'을 되뇐다",mp:6,tr:{belonging:-2},whisper:"이 또한 지나가리"}]},
 {g:"psych",m:"str",cat:"협업 스타일",q:"팀플에서 당신의 포지션은?",opts:[
   {t:"판을 짜고 역할을 나눈다",eff:{기획력:3,조직이해도:1},whisper:"교통정리는 내가"},
   {t:"갈등을 중재하고 붙인다",eff:{소통력:3},tr:{social:1},whisper:"싸우지 말고 얘기해요"},
-  {t:"묵묵히 실무를 처리한다",eff:{행정력:2,기술이해도:1},tr:{social:-1},whisper:"결국 누군가는 해야지"},
+  {t:"묵묵히 실무를 처리한다",eff:{행정력:2,디지털:1},tr:{social:-1},whisper:"결국 누군가는 해야지"},
   {t:"새 아이디어로 물꼬를 튼다",eff:{창의력:3},tr:{novelty:1},whisper:"이건 어때요?"}]},
 {g:"psych",m:"int",cat:"동기부여",q:"언제 가장 '일할 맛'이 나나?",opts:[
-  {t:"복잡한 문제를 풀어냈을 때",like:{기획력:1,기술이해도:1},whisper:"쾌감이 있지"},
+  {t:"복잡한 문제를 풀어냈을 때",like:{기획력:1,디지털:1},whisper:"쾌감이 있지"},
   {t:"누군가에게 도움이 됐을 때",like:{소통력:1},tr:{social:1},whisper:"보람이 최고"},
   {t:"내 손으로 뭔가 완성했을 때",like:{창의력:1,행정력:1},whisper:"결과물이 남잖아"},
   {t:"조직이 잘 굴러가게 만들 때",like:{조직이해도:1},tr:{belonging:1},whisper:"톱니바퀴의 미학"}]},
 {g:"psych",m:"str",cat:"갈등",q:"상사와 방향이 다르다. 당신의 대응은?",opts:[
-  {t:"데이터·근거로 설득한다",eff:{기획력:2,기술이해도:1},whisper:"팩트로 말해요"},
+  {t:"데이터·근거로 설득한다",eff:{기획력:2,디지털:1},whisper:"팩트로 말해요"},
   {t:"의도를 먼저 물어본다",eff:{소통력:3},tr:{social:1},whisper:"이유가 있겠지"},
   {t:"일단 지시를 따르되 기록",eff:{행정력:3},tr:{belonging:1},whisper:"근거는 남긴다"},
   {t:"제3의 절충안을 낸다",eff:{창의력:2,조직이해도:1},tr:{novelty:1},whisper:"둘 다 만족할 방법"}]},
@@ -305,18 +304,18 @@ const Q = [
   {t:"키워드만 들고 말빨로 승부",eff:{소통력:3,창의력:1},tr:{social:1,novelty:1},whisper:"믿을 건 입뿐"}]},
 {g:"psych",m:"str",cat:"일 성향",q:"직무와 상관없이 새로운 일을 해볼 수 있다면?",opts:[
   {t:"개수·일정이 딱 정해진 일 (파워 대문자 J)",eff:{행정력:3,조직이해도:1},tr:{novelty:-1},whisper:"계획대로가 최고"},
-  {t:"반복돼도 몰입할 수 있는 조용한 일",eff:{기술이해도:3},tr:{social:-2},whisper:"나와의 싸움이 편해"},
-  {t:"지루한 건 질색! 변화 있는 일",eff:{창의력:3,AI이해도:1},tr:{novelty:2},whisper:"새로움이 연료"},
+  {t:"반복돼도 몰입할 수 있는 조용한 일",eff:{디지털:3},tr:{social:-2},whisper:"나와의 싸움이 편해"},
+  {t:"지루한 건 질색! 변화 있는 일",eff:{창의력:3,디지털:1},tr:{novelty:2},whisper:"새로움이 연료"},
   {t:"기획하고 소통하며 내 방향으로 이끄는 일",eff:{소통력:2,기획력:2},tr:{social:1},whisper:"판을 움직이는 손(ㅎㅎ)"}]},
 {g:"psych",m:"str",cat:"소통 스타일",q:"내막이 복잡해 설명하기 어려운 일을 동료·상사에게 전해야 한다. 나의 선택은?",opts:[
   {t:"답답해, 바로 찾아가서 말한다",eff:{소통력:3},tr:{social:2},whisper:"얼굴 보고 해야지"},
-  {t:"메신저로 반응 봐가며 주고받는다",eff:{소통력:2,기술이해도:1},whisper:"실시간이 편해"},
+  {t:"메신저로 반응 봐가며 주고받는다",eff:{소통력:2,디지털:1},whisper:"실시간이 편해"},
   {t:"충분히 정리한 뒤 쪽지로 보낸다",eff:{기획력:2,행정력:1},tr:{social:-2},whisper:"글로 정리해야 안심"},
   {t:"커피 한잔하며 편한 분위기에서",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"분위기부터 풀고"}]},
 
 /* ===== 돌발 9 (strength + 개그) ===== */
 {g:"event",m:"str",cat:"돌발",q:"[돌발] '최종'이라는 이름의 파일이 8개다. 어느 게 진짜 최종인가…?",opts:[
-  {t:"수정 시각으로 냉철하게 추적",eff:{기술이해도:3},tr:{social:-1},whisper:"형사님이세요?"},
+  {t:"수정 시각으로 냉철하게 추적",eff:{디지털:3},tr:{social:-1},whisper:"형사님이세요?"},
   {t:"눈물을 머금고 그냥 다 열어본다",eff:{행정력:2},mp:-5,whisper:"제 하루를 돌려주세요"},
   {t:"파일 만든 범인을 색출한다",eff:{소통력:2},tr:{social:1},whisper:"이 죄를 지은 자, 누구인가"}]},
 {g:"event",m:"str",cat:"돌발",q:"[돌발] 정각 퇴근 1분 전, 팀장님 메시지 '잠깐 통화 돼요?'",opts:[
@@ -328,7 +327,7 @@ const Q = [
   {t:"빈 회의실을 발로 뛰어 찾는다",eff:{조직이해도:2},hp:-4,whisper:"오늘의 유산소"},
   {t:"\"저희 그냥 복도에서 할게요\"",eff:{창의력:2},tr:{novelty:1,belonging:-2},whisper:"여기가 회의실이다"}]},
 {g:"event",m:"str",cat:"돌발",q:"[돌발] 급한데 프린터가 용지 걸림. 하필 오늘, 하필 나에게만.",opts:[
-  {t:"침착하게 분해해 복구한다",eff:{기술이해도:3},tr:{social:-1},whisper:"IT인의 자존심"},
+  {t:"침착하게 분해해 복구한다",eff:{디지털:3},tr:{social:-1},whisper:"IT인의 자존심"},
   {t:"다른 층 프린터로 질주",eff:{조직이해도:1},hp:-5,whisper:"이번 주 운동 끝"},
   {t:"옆자리 선배에게 SOS",eff:{소통력:2},tr:{social:1},whisper:"도와줘요 선배님"}]},
 {g:"event",m:"str",cat:"돌발",q:"[돌발] 월요일 아침, 출근하자마자 '오늘 안에' 자료 요청이 도착했다.",opts:[
@@ -345,11 +344,11 @@ const Q = [
 {g:"event",m:"str",cat:"돌발·KIPI",q:"[돌발] \"검색해도 안 나온다\"는 민원 전화. 알고 보니 검색어 오타.",opts:[
   {t:"친절하게 검색 팁을 안내",eff:{소통력:3},mp:-4,tr:{social:1},whisper:"고객님… 사랑합니다"},
   {t:"이참에 검색 UX 개선안을 메모",eff:{창의력:2,기획력:1},tr:{novelty:1},whisper:"이게 다 인사이트지"},
-  {t:"자주 묻는 오류를 FAQ로 정리",eff:{행정력:2,AI이해도:1},whisper:"다음엔 안 물어보게"}]},
+  {t:"자주 묻는 오류를 FAQ로 정리",eff:{행정력:2,디지털:1},whisper:"다음엔 안 물어보게"}]},
 {g:"event",m:"str",cat:"돌발·KIPI",q:"[돌발] 홈페이지 안내문 오타를 민원인이 먼저 발견해 제보했다. (부끄…)",opts:[
   {t:"즉시 정정하고 정중히 감사 회신",eff:{소통력:3},tr:{social:1},whisper:"고객님이 교정위원…"},
   {t:"전체 안내문을 싹 재점검한다",eff:{행정력:2,기획력:1},whisper:"이참에 대청소"},
-  {t:"오타 자동검수 방법을 찾아본다",eff:{AI이해도:1,창의력:2},tr:{novelty:1},whisper:"두 번은 없다"}]},
+  {t:"오타 자동검수 방법을 찾아본다",eff:{디지털:1,창의력:2},tr:{novelty:1},whisper:"두 번은 없다"}]},
 ];
 
 /* ---------- 엔딩(급) — 점수 등급용 참고 ---------- */
@@ -397,7 +396,7 @@ function scoreOf(s,burnout){
   const spec=vals[0]>=45?90:0;
   const D=Math.max(s.hp*0.5+s.mp*0.6, spec);
   const E=burnout*70;
-  return Math.max(0,Math.round(A*3.0 + D - E));
+  return Math.max(0,Math.round(A*1.7 + D - E));
 }
 function gradeOf(sc){ return sc>=980?"S":sc>=880?"A":sc>=780?"B":sc>=680?"C":"D"; }
 
@@ -463,11 +462,29 @@ function startRandom(){
   newGame(nick, randSeed()); screenTurn();
 }
 function start2rand(){ newGame(G.nick, randSeed()); screenTurn(); }
-function statBars(s){
-  return STAT_KEYS.map(k=>`<div class="stat"><span>${k} <b>${s[k]}</b></span>
-    <div class="bar"><i style="width:${Math.min(100,s[k])}%"></i></div></div>`).join("")
-    +`<div class="stat mp"><span>멘탈 <b>${s.mp}</b></span><div class="bar"><i style="width:${Math.max(0,s.mp)}%"></i></div></div>`
+const RADAR_LABEL={기획력:"기획",소통력:"소통",행정력:"행정",디지털:"디지털",조직이해도:"조직",창의력:"창의"};
+function statHpMp(s){
+  return `<div class="stat mp"><span>멘탈 <b>${s.mp}</b></span><div class="bar"><i style="width:${Math.max(0,s.mp)}%"></i></div></div>`
     +`<div class="stat hp"><span>체력 <b>${s.hp}</b></span><div class="bar"><i style="width:${Math.max(0,s.hp)}%"></i></div></div>`;
+}
+function drawRadar(id,s){
+  const cv=document.getElementById(id); if(!cv||!cv.getContext)return;
+  const ctx=cv.getContext('2d'),W=cv.width,H=cv.height,cx=W/2,cy=H/2,R=Math.min(W/2,H/2)-52,N=STAT_KEYS.length,MAX=30;
+  const gv=k=>Math.max(0,s[k]-START_STAT); // 성장분(0부터 자라남)
+  ctx.clearRect(0,0,W,H);
+  for(let ring=1;ring<=4;ring++){const r=R*ring/4;ctx.beginPath();
+    for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+    ctx.closePath();ctx.strokeStyle='#e0e8f6';ctx.lineWidth=1;ctx.stroke();}
+  ctx.font='600 20px "Malgun Gothic",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.strokeStyle='#e0e8f6';ctx.stroke();
+    const lx=cx+(R+30)*Math.cos(a),ly=cy+(R+22)*Math.sin(a);
+    ctx.fillStyle='#42506b';ctx.fillText(RADAR_LABEL[STAT_KEYS[i]]+" +"+gv(STAT_KEYS[i]),lx,ly);}
+  ctx.beginPath();
+  for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,v=Math.min(MAX,gv(STAT_KEYS[i]))/MAX,r=R*v,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+  ctx.closePath();ctx.fillStyle='rgba(31,95,214,.25)';ctx.fill();ctx.strokeStyle='#1f5fd6';ctx.lineWidth=2.5;ctx.stroke();
+  for(let i=0;i<N;i++){const a=-Math.PI/2+i*2*Math.PI/N,v=Math.min(MAX,gv(STAT_KEYS[i]))/MAX,r=R*v,x=cx+r*Math.cos(a),y=cy+r*Math.sin(a);
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle='#1f5fd6';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();}
 }
 function bClass(g){return g==="kipi"?"kipi":(g==="event"?"event":"cat");}
 
@@ -483,7 +500,10 @@ function screenTurn(){
     <div class="choices">${c.opts.map((o,i)=>`<button class="choice" onclick="choose(${i})">${o.t}
       ${o.whisper?`<span class="whisper">“${o.whisper}”</span>`:``}</button>`).join("")}</div>
   </div>
-  <div class="card"><h2>능력치</h2><div class="stats">${statBars(G.stats)}</div></div>`);
+  <div class="card"><h2>능력치</h2>
+    <canvas id="radarTurn" width="620" height="400" class="radar"></canvas>
+    <div class="stats hpmp">${statHpMp(G.stats)}</div></div>`);
+  drawRadar("radarTurn", G.stats);
 }
 
 function choose(i){
@@ -491,13 +511,15 @@ function choose(i){
   if(c.m==="str" && o.eff) applyEff(o.eff,ch);
   if(c.m==="int" && o.like){ for(const k in o.like){ G.like[k]+=o.like[k]; ch.push([k,"it",o.like[k]]); } }
   if(o.tr){ for(const a in o.tr) G.trait[a]=(G.trait[a]||0)+o.tr[a]; }
-  if(typeof o.mp==="number"){ G.stats.mp=clamp(G.stats.mp+o.mp); ch.push(["멘탈",o.mp>0?"up":"dn",Math.abs(o.mp)]); }
-  if(typeof o.hp==="number"){ G.stats.hp=clamp(G.stats.hp+o.hp); ch.push(["체력",o.hp>0?"up":"dn",Math.abs(o.hp)]); }
+  G.stats.mp=clamp(G.stats.mp-4); ch.push(["멘탈(업무 피로)","dn",4]); // 매 턴 기본 소모
+  if(typeof o.mp==="number"){ const d=Math.round(o.mp*1.7); G.stats.mp=clamp(G.stats.mp+d); ch.push(["멘탈",d>0?"up":"dn",Math.abs(d)]); }
+  G.stats.hp=clamp(G.stats.hp-2); ch.push(["체력(업무 피로)","dn",2]); // 매 턴 기본 소모
+  if(typeof o.hp==="number"){ const d=Math.round(o.hp*1.7); G.stats.hp=clamp(G.stats.hp+d); ch.push(["체력",d>0?"up":"dn",Math.abs(d)]); }
   if(G.stats.mp<=0||G.stats.hp<=0){ G.burnout++; G.stats.mp=clamp(G.stats.mp+20); G.stats.hp=clamp(G.stats.hp+20); }
   G.log.push({q:G.turns[G.t],c:i}); G.t++;
   screenFeedback(ch,o.whisper,c.m);
 }
-function applyEff(eff,ch){ for(const k in eff){ if(STAT_KEYS.includes(k)){ G.stats[k]=Math.max(0,G.stats[k]+eff[k]); if(eff[k]) ch.push([k,eff[k]>0?"up":"dn",Math.abs(eff[k])]); } } }
+function applyEff(eff,ch){ for(const k in eff){ if(STAT_KEYS.includes(k)){ const d=Math.round(eff[k]*1.8); G.stats[k]=Math.max(0,G.stats[k]+d); if(d) ch.push([k,d>0?"up":"dn",Math.abs(d)]); } } }
 function clamp(v){return Math.max(0,Math.min(100,v));}
 
 function screenFeedback(ch,whisper,m){
@@ -572,8 +594,9 @@ function screenResult(){
 
     <div class="kv"><span>번아웃(멘탈·체력 소진)</span><b>${G.burnout}회</b></div>
     <div class="kv"><span>소요 시간</span><b>${(time/1000).toFixed(1)}초</b></div>
-    <h2 style="margin-top:16px">능력치</h2>
-    <div class="stats">${statBars(s)}</div>
+    <h2 style="margin-top:16px">능력치 레이더</h2>
+    <canvas id="radarResult" width="620" height="400" class="radar"></canvas>
+    <div class="stats hpmp">${statHpMp(s)}</div>
     <div class="row2">
       <button class="btn ghost" onclick="screenStart()">처음으로</button>
       <button class="btn ghost" onclick="start2rand()">🎲 새 문항</button>
@@ -595,6 +618,7 @@ function screenResult(){
     ${lbTable(G.seed,entry.id)}
     <p class="muted">등급은 '얼마나 뾰족하게 키웠나'일 뿐, 어느 캐릭터가 더 낫고 나쁨은 없어요. 서로 강점이 다를 뿐!<br>※ 프로토타입은 이 브라우저에만 저장됩니다.</p>
   </div>`);
+  drawRadar("radarResult", s);
 }
 function start2(){ newGame(G.nick,G.seed); screenTurn(); }
 
