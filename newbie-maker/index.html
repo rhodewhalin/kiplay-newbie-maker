@@ -101,7 +101,7 @@
    ============================================================ */
 
 const STAT_KEYS = ["기획력","소통력","행정력","디지털","조직이해도","창의력"];
-const START_STAT = 25, START_HPMP = 100, TURNS = 12;
+const START_STAT = 25, START_HPMP = 100, TURNS = 15;
 const PICK = { kipi:5, psych:5, event:2 };
 
 const FIT = {
@@ -225,10 +225,10 @@ const Q = [
   {t:"업무 경계를 명확히 나눈다",eff:{행정력:3},whisper:"선은 지키자"},
   {t:"공통 목표로 관심을 돌린다",eff:{조직이해도:3},tr:{belonging:1},whisper:"우린 한 팀이잖아"}]},
 {g:"psych",m:"stress",cat:"번아웃",q:"금요일 밤, 아직 퇴근을 못 했다. 무엇이 당신을 가장 지치게 하나?",opts:[
-  {t:"끝없이 밀려오는 자료 요청",mp:-6,whisper:"또 국회자료야…"},
-  {t:"방향 없이 도는 회의",mp:-5,tr:{social:-1},whisper:"이 회의 왜 하는 거지"},
-  {t:"익숙지 않은 새 시스템",mp:-5,tr:{novelty:-1},whisper:"이거 어떻게 쓰는 거야"},
-  {t:"내 일 같지 않은 잡무",mp:-5,tr:{belonging:-2},whisper:"이걸 왜 내가…"}]},
+  {t:"끝없이 밀려오는 자료 요청",pain:"쏟아지는 요청에 휘둘릴 때 지쳐요. 우선순위를 정할 여유가 있어야 살아나는 사람이에요.",whisper:"또 국회자료야…"},
+  {t:"방향 없이 도는 회의",tr:{social:-1},pain:"결론 없는 회의가 답답한 사람. 명확한 목표가 보일 때 힘이 나요.",whisper:"이 회의 왜 하는 거지"},
+  {t:"익숙지 않은 새 시스템",tr:{novelty:-1},pain:"낯선 도구·시스템 앞에서 진이 빠져요. 익숙해질 시간만 주어지면 문제없어요.",whisper:"이거 어떻게 쓰는 거야"},
+  {t:"내 일 같지 않은 잡무",tr:{belonging:-2},pain:"'이게 왜 내 일이지' 싶은 일에 의욕이 꺾여요. 역할이 분명할 때 몰입하는 사람이에요.",whisper:"이걸 왜 내가…"}]},
 {g:"psych",m:"str",cat:"적성 발견",q:"새 프로젝트가 시작됐다. 팀이 당신에게 기대하는 역할은?",opts:[
   {t:"전체 그림과 일정을 짜는 사람",eff:{기획력:3,조직이해도:1},whisper:"판을 짜는 게 재밌어"},
   {t:"관계기관·팀을 조율하는 사람",eff:{소통력:3,조직이해도:1},tr:{social:1},whisper:"중간에서 연결하는 게 나야"},
@@ -245,10 +245,10 @@ const Q = [
   {t:"\"이 시스템 자네가 만들었어?\"",eff:{디지털:4},tr:{social:-1},whisper:"만드는 게 좋아"},
   {t:"\"그런 생각을 어떻게 했어?\"",eff:{창의력:4},tr:{novelty:1},whisper:"새로운 게 좋아"}]},
 {g:"psych",m:"stress",cat:"번아웃",q:"연차를 쓰고 싶다. 가장 큰 이유는?",opts:[
-  {t:"밀린 일 생각에 머리가 꽉 참",mp:-4,whisper:"쉬어도 쉬는 게 아냐"},
-  {t:"사람 상대가 너무 지침",mp:-4,tr:{social:-1},whisper:"오늘은 아무도 안 만나고 싶어"},
-  {t:"의미 없는 반복이 답답함",mp:-3,tr:{novelty:1},whisper:"이게 성장하는 걸까"},
-  {t:"그냥 재충전이 필요함",mp:12,tr:{belonging:-2},whisper:"잘 쉬는 것도 실력"}]},
+  {t:"밀린 일 생각에 머리가 꽉 참",pain:"쉬어도 일 생각이 떠나지 않는 스타일. 일과 삶의 선을 그으면 훨씬 가벼워져요.",whisper:"쉬어도 쉬는 게 아냐"},
+  {t:"사람 상대가 너무 지침",tr:{social:-1},pain:"사람에 둘러싸이면 배터리가 빨리 닳아요. 혼자 충전하는 시간이 꼭 필요한 사람이에요.",whisper:"오늘은 아무도 안 만나고 싶어"},
+  {t:"의미 없는 반복이 답답함",tr:{novelty:1},pain:"반복되는 일상이 지루한 사람. 새로움·변화가 있을 때 눈이 반짝여요.",whisper:"이게 성장하는 걸까"},
+  {t:"그냥 재충전이 필요함",tr:{belonging:-2},pain:"스스로를 챙길 줄 아는 건강한 사람. 다만 쉬어도 개운치 않다면 잠깐 속도를 늦춰도 좋아요.",whisper:"잘 쉬는 것도 실력"}]},
 {g:"psych",m:"str",cat:"관계 스트레스",q:"회의에서 내 아이디어가 묻혔다. 당신은?",opts:[
   {t:"근거를 보강해 다시 제안",eff:{기획력:3,행정력:1},whisper:"포기는 없어"},
   {t:"키맨을 따로 설득한다",eff:{소통력:3},tr:{social:1},whisper:"물밑작업이 필요해"},
@@ -312,6 +312,21 @@ const Q = [
   {t:"메신저로 반응 봐가며 주고받는다",eff:{소통력:2,디지털:1},whisper:"실시간이 편해"},
   {t:"충분히 정리한 뒤 쪽지로 보낸다",eff:{기획력:2,행정력:1},tr:{social:-2},whisper:"글로 정리해야 안심"},
   {t:"커피 한잔하며 편한 분위기에서",eff:{소통력:2,조직이해도:1},tr:{social:1},whisper:"분위기부터 풀고"}]},
+{g:"psych",m:"stress",cat:"번아웃",q:"문득 '내가 지금 뭐 하고 있지?' 현타가 오는 순간은?",opts:[
+  {t:"사소한 데이터 오류를 하루 종일 쫓을 때",pain:"디테일에 발목 잡히면 진이 빠져요. 큰 흐름·방향을 볼 때 숨통이 트이는 사람이에요.",whisper:"출원인 이름 하나 때문에…"},
+  {t:"똑같은 민원 전화를 세 번째 받을 때",tr:{social:-1},pain:"사람을 반복해 상대하는 게 유독 힘들어요. 감정 소모가 큰 자리는 오래 못 버티는 편이에요.",whisper:"검색이 안 된다고요…(또요?)"},
+  {t:"회의가 또 다른 회의를 부를 때",pain:"결론 없는 과정이 답답한 사람. 명확한 목표·마감이 있어야 힘이 나요.",whisper:"결론은 '다음에 다시'"},
+  {t:"텅 빈 퇴근길, 오늘 뭘 했는지 기억이 안 날 때",pain:"바빴는데 남는 게 없으면 지치는 '성취감 갈증'형. 의미와 성과가 보일 때 살아나는 사람이에요.",whisper:"분명 바빴는데…"}]},
+{g:"psych",m:"stress",cat:"번아웃",q:"일요일 밤, 가장 마음이 무거운 이유는?",opts:[
+  {t:"안 읽은 메일 숫자",pain:"쌓인 일이 눈에 보이면 압박을 크게 느껴요. 그때그때 비워내는 리듬이 맞는 사람이에요.",whisper:"월요일의 습격 예고편"},
+  {t:"못 끝낸 지난주 숙제",tr:{belonging:1},pain:"마무리 못 한 일이 마음에 걸리는 책임감형. 확실히 끝냈을 때 개운함을 느껴요.",whisper:"미래의 나에게 떠넘긴 죄"},
+  {t:"내일 아침 회의",tr:{social:-1},pain:"준비 안 된 자리에 서는 걸 부담스러워해요. 충분히 준비될 때 자신감이 붙는 사람이에요.",whisper:"자료 아직 반도 못 만들었는데"},
+  {t:"그냥… 출근 자체가",tr:{belonging:-2},pain:"요즘 일 자체가 버겁다면 번아웃 신호일 수 있어요. 잠깐 숨 고를 때가 됐는지도 몰라요.",whisper:"이불 밖은 위험해"}]},
+{g:"psych",m:"stress",cat:"번아웃",q:"요즘 '영혼이 좀 나갔다' 싶은 순간은?",opts:[
+  {t:"\"네, 확인했습니다\" (사실은 스크롤만)",tr:{social:-1},pain:"집중이 흩어지고 있다는 신호. 진짜 몰입할 만한 일이 필요한 사람이에요.",whisper:"눈은 읽고 뇌는 쉬는 중"},
+  {t:"작년 보고서를 올해 것으로 복붙",tr:{novelty:1},pain:"복붙하는 순간 회의감이 드는 사람. 새로 만들고 시도할 때 살아나요.",whisper:"창의성은 어디에…"},
+  {t:"종이서류 전자화를 500장째",pain:"단순 반복이 영혼을 갉아먹어요. 머리 쓰는 일에서 에너지를 얻는 사람이에요.",whisper:"오늘도 스캔의 신이 된다"},
+  {t:"화상회의에서 고개만 끄덕끄덕",pain:"존재감 없이 앉아있는 시간이 힘들어요. 주도적으로 참여할 때 신이 나는 사람이에요.",whisper:"생각은 이미 점심 메뉴"}]},
 
 /* ===== 돌발 9 (strength + 개그) ===== */
 {g:"event",m:"str",cat:"돌발",q:"[돌발] '최종'이라는 이름의 파일이 8개다. 어느 게 진짜 최종인가…?",opts:[
@@ -371,11 +386,11 @@ function buildTurns(seed){
     else if(q.m==="stress")g.pstress.push(i);
     else g.pstr.push(i);
   });
-  // 성향 5 = 흥미 1 + 스트레스 1 + 강점형 3 (끌리는 일·힘든 이유가 매판 최소 1개씩)
-  let p=shuffle(g.kipi,rnd).slice(0,5)
+  // 15문항 = 회사현안6 + 성향7(흥미1+스트레스1+강점5) + 돌발2 (끌리는 일·힘든 이유가 매판 최소 1개씩)
+  let p=shuffle(g.kipi,rnd).slice(0,6)
     .concat(shuffle(g.pint,rnd).slice(0,1))
     .concat(shuffle(g.pstress,rnd).slice(0,1))
-    .concat(shuffle(g.pstr,rnd).slice(0,3))
+    .concat(shuffle(g.pstr,rnd).slice(0,5))
     .concat(shuffle(g.event,rnd).slice(0,2));
   return shuffle(p,rnd);
 }
@@ -386,7 +401,7 @@ function newGame(nick,seed){
   const s={}; STAT_KEYS.forEach(k=>s[k]=START_STAT); s.hp=START_HPMP; s.mp=START_HPMP;
   const like={}; STAT_KEYS.forEach(k=>like[k]=0);
   G={nick,seed,stats:s,like,trait:{social:0,novelty:0,belonging:0},
-     turns:buildTurns(seed),t:0,burnout:0,startTime:Date.now(),log:[]};
+     turns:buildTurns(seed),t:0,burnout:0,startTime:Date.now(),log:[],painPick:null};
 }
 
 /* ---------- 점수 + 등급 ---------- */
@@ -396,7 +411,7 @@ function scoreOf(s,burnout){
   const spec=vals[0]>=45?90:0;
   const D=Math.max(s.hp*0.5+s.mp*0.6, spec);
   const E=burnout*70;
-  return Math.max(0,Math.round(A*1.7 + D - E));
+  return Math.max(0,Math.round(A*2.8 + D - E));
 }
 function gradeOf(sc){ return sc>=980?"S":sc>=880?"A":sc>=780?"B":sc>=680?"C":"D"; }
 
@@ -440,20 +455,19 @@ function screenStart(){
     <p class="sub">우리원 신입이 되어 12번의 선택을 한다.<br><b>내 강점 · 끌리는 일 · 힘든 이유</b>와 <b>일하는 성향</b>까지 알아보고, 나만의 캐릭터로 성장해요.</p>
     <label>닉네임</label>
     <input id="nick" type="text" maxlength="12" placeholder="예: 혜연" />
-    <label>대회 시드 (같은 값끼리 경쟁)</label>
-    <input id="seed" type="text" maxlength="24" value="${DEFAULT_SEED}" />
+    <label>대회 코드 <span style="font-weight:400;color:#8a94a8">(있으면 입력 · 없으면 매번 다른 문항)</span></label>
+    <input id="seed" type="text" maxlength="24" placeholder="대회 날 받은 코드가 있으면 입력" />
     <div style="height:14px"></div>
-    <button class="btn" onclick="start()">입사하기 ▶ <span style="font-weight:400;font-size:12px;opacity:.85">(대회 시드로 경쟁)</span></button>
-    <div style="height:9px"></div>
-    <button class="btn ghost" onclick="startRandom()">🎲 랜덤 문항으로 연습하기</button>
-    <p class="muted">문항 ${Q.length}개 중 12개(회사현안5·성향5·돌발2) · 캐릭터 도감 ${got}/${DEX_ORDER.length}<br>대회 시드는 매번 같은 문항(공정 경쟁), 랜덤은 매번 다른 문항이 나와요.</p>
+    <button class="btn" onclick="start()">입사하기 ▶</button>
+    <p class="muted">문항 ${Q.length}개 중 15개(회사현안6·성향7·돌발2) · 캐릭터 도감 ${got}/${DEX_ORDER.length}<br>그냥 입사하면 <b>매번 다른 문항</b>, 대회 코드를 넣으면 <b>같은 문항으로 공정 경쟁</b>이에요.</p>
   </div>
-  ${loadLB(DEFAULT_SEED).length?`<div class="card"><h2>🏆 리더보드 (${DEFAULT_SEED})</h2>${lbTable(DEFAULT_SEED,null)}</div>`:``}
+  ${loadLB(DEFAULT_SEED).length?`<div class="card"><h2>🏆 대회 리더보드 (${DEFAULT_SEED})</h2>${lbTable(DEFAULT_SEED,null)}</div>`:``}
   `);
 }
 function start(){
   const nick=(document.getElementById("nick").value||"익명").trim().slice(0,12);
-  const seed=(document.getElementById("seed").value||DEFAULT_SEED).trim();
+  const seedInput=(document.getElementById("seed").value||"").trim();
+  const seed = seedInput || randSeed(); // 대회 코드 없으면 매번 다른 문항
   newGame(nick,seed); screenTurn();
 }
 function randSeed(){ return "연습-"+Math.floor(Math.random()*1e9).toString(36); }
@@ -510,8 +524,9 @@ function choose(i){
   const c=Q[G.turns[G.t]]; const o=c.opts[i]; const ch=[];
   if(c.m==="str" && o.eff) applyEff(o.eff,ch);
   if(c.m==="int" && o.like){ for(const k in o.like){ G.like[k]+=o.like[k]; ch.push([k,"it",o.like[k]]); } }
+  if(c.m==="stress" && o.pain){ G.painPick=o.pain; ch.push(["나를 지치게 하는 걸 알았어요","note",0]); }
   if(o.tr){ for(const a in o.tr) G.trait[a]=(G.trait[a]||0)+o.tr[a]; }
-  G.stats.mp=clamp(G.stats.mp-4); ch.push(["멘탈(업무 피로)","dn",4]); // 매 턴 기본 소모
+  G.stats.mp=clamp(G.stats.mp-3); ch.push(["멘탈(업무 피로)","dn",3]); // 매 턴 기본 소모
   if(typeof o.mp==="number"){ const d=Math.round(o.mp*1.7); G.stats.mp=clamp(G.stats.mp+d); ch.push(["멘탈",d>0?"up":"dn",Math.abs(d)]); }
   G.stats.hp=clamp(G.stats.hp-2); ch.push(["체력(업무 피로)","dn",2]); // 매 턴 기본 소모
   if(typeof o.hp==="number"){ const d=Math.round(o.hp*1.7); G.stats.hp=clamp(G.stats.hp+d); ch.push(["체력",d>0?"up":"dn",Math.abs(d)]); }
@@ -524,6 +539,7 @@ function clamp(v){return Math.max(0,Math.min(100,v));}
 
 function screenFeedback(ch,whisper,m){
   const txt=ch.length?ch.map(c=>{
+    if(c[1]==="note") return `<b style="color:var(--bad)">💢 ${c[0]}</b>`;
     if(c[1]==="it") return `${c[0]} <b class="it">관심 ♥</b>`;
     return `${c[0]} <b class="${c[1]}">${c[1]==="up"?"+":"−"}${c[2]}</b>`;
   }).join(" · "):"기록됨";
@@ -558,7 +574,7 @@ function screenResult(){
   const entry={id:Date.now()+"-"+Math.floor(Math.random()*1e6),nick:G.nick,score,grade,time,char:ch.name};
   const myRank=saveScore(G.seed,entry);
 
-  const painKey=(s.mp<40)?"낮은멘탈":low;
+  const painText = G.painPick || PAIN[(s.mp<40)?"낮은멘탈":low];
   const fitS=FIT[strongTop];
   const likeBlock = likeTop ? `
     <div class="insight like"><div class="h">❤️ 당신이 끌리는 일</div>
@@ -589,7 +605,7 @@ function screenResult(){
     </div>
     ${likeBlock}
     <div class="insight hard"><div class="h">💢 당신이 회사에서 힘든 이유</div>
-      <div style="font-size:14px">${PAIN[painKey]}</div>
+      <div style="font-size:14px">${painText}</div>
     </div>
 
     <div class="kv"><span>번아웃(멘탈·체력 소진)</span><b>${G.burnout}회</b></div>
