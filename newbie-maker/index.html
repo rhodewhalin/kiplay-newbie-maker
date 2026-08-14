@@ -179,8 +179,8 @@ const BASE_CHAR = {
   창의력:{e:"💡",name:"아이디어 뱅크",desc:"아무도 안 한 방식을 던지는 사람. 지루한 건 못 참아요."},
 };
 const SPECIAL = {
-  한량:{e:"🕊️",name:"오늘도 7시에 출근한 한량",
-    desc:"조선시대였다면 대청마루에서 유유자적했을 사람. 마음은 파이어족, 몸은 새벽 7시 정각 출근. 그래도 월급값은 합니다 — 남한테 피해는 못 주죠."},
+  한량:{e:"🕊️",name:"마이 페이스의 여유러",
+    desc:"아등바등 대신 마이 페이스. 무리해서 불태우기보단 지속 가능하게 가는 사람 — 어쩌면 회사생활 진짜 고수일지도?"},
   균형:{e:"⚖️",name:"균형 잡힌 만능 실무가",
     desc:"어느 하나 빠지지 않는 올라운더. 어디에 놔둬도 제 몫을 해내는 사람이에요."},
 };
@@ -616,19 +616,14 @@ function screenTurn(){
   const c=Q[G.turns[G.t]]; const pct=Math.round(G.t/G.turns.length*100);
   el(`
   <div class="card">
-    <div class="turnmeta"><span>${G.t+1} / ${G.turns.length}턴</span><span>${G.nick} · ${G.seed}</span></div>
+    <div class="charrow" style="margin-bottom:8px;padding-bottom:8px">${charSVG(G.char,46)}<div><div class="cnm" style="font-size:14px">${G.nick}</div><div class="cln">${G.t+1} / ${G.turns.length}턴 · ${G.char.tag}</div></div></div>
     <div class="prog"><i style="width:${pct}%"></i></div>
     <span class="badge ${bClass(c.g)}">${c.cat}</span>
     <h2 style="min-height:46px">${c.q}</h2>
     <div class="choices">${c.opts.map((o,i)=>`<button class="choice" onclick="choose(${i})">${o.t}
       ${o.whisper?`<span class="whisper">“${o.whisper}”</span>`:``}</button>`).join("")}</div>
-  </div>
-  <div class="card">
-    <div class="charrow">${charSVG(G.char,64)}<div><div class="cnm">${G.nick}</div><div class="cln">${G.char.tag}</div></div></div>
-    <h2>능력치</h2>
-    <canvas id="radarTurn" width="620" height="400" class="radar"></canvas>
-    <div class="stats hpmp">${statHpMp(G.stats)}</div></div>`);
-  drawRadar("radarTurn", G.stats);
+    <div id="turnResult"></div>
+  </div>`);
 }
 
 function choose(i){
@@ -642,27 +637,26 @@ function choose(i){
   G.stats.hp=clamp(G.stats.hp-2); ch.push(["체력(업무 피로)","dn",2]); // 매 턴 기본 소모
   if(typeof o.hp==="number"){ const d=Math.round(o.hp*1.7); G.stats.hp=clamp(G.stats.hp+d); ch.push(["체력",d>0?"up":"dn",Math.abs(d)]); }
   if(G.stats.mp<=0||G.stats.hp<=0){ G.burnout++; G.stats.mp=clamp(G.stats.mp+20); G.stats.hp=clamp(G.stats.hp+20); }
-  G.log.push({q:G.turns[G.t],c:i}); G.t++;
-  screenFeedback(ch,o.whisper,c.m);
+  G.log.push({q:G.turns[G.t],c:i});
+  showTurnResult(ch,o.whisper,c.m);
 }
 function applyEff(eff,ch){ for(const k in eff){ if(STAT_KEYS.includes(k)){ const d=Math.round(eff[k]*1.8); G.stats[k]=Math.max(0,G.stats[k]+d); if(d) ch.push([k,d>0?"up":"dn",Math.abs(d)]); } } }
 function clamp(v){return Math.max(0,Math.min(100,v));}
 
-function screenFeedback(ch,whisper,m){
-  const txt=ch.length?ch.map(c=>{
+function showTurnResult(ch,whisper,m){
+  document.querySelectorAll('.choice').forEach(function(b){b.disabled=true;b.style.opacity=".5";b.style.pointerEvents="none";b.style.boxShadow="none";});
+  const txt=ch.length?ch.map(function(c){
     if(c[1]==="note") return `<b style="color:var(--bad)">💢 ${c[0]}</b>`;
     if(c[1]==="it") return `${c[0]} <b class="it">관심 ♥</b>`;
     return `${c[0]} <b class="${c[1]}">${c[1]==="up"?"+":"−"}${c[2]}</b>`;
   }).join(" · "):"기록됨";
-  el(`
-  <div class="card">
-    <div class="badge">${G.t} / ${G.turns.length}턴 완료</div>
-    <h2>선택 결과</h2>
-    <div class="fx">${whisper?`<span class="rx">“${whisper}”</span>`:``}${txt}</div>
-    <div style="height:14px"></div>
-    <button class="btn" onclick="screenTurn()">${G.t>=G.turns.length?"결과 확인 ▶":"다음 ▶"}</button>
-  </div>`);
+  const last=(G.t+1>=G.turns.length);
+  const el2=document.getElementById('turnResult');
+  el2.innerHTML=`<div class="fx" style="margin-top:12px">${whisper?`<span class="rx">“${whisper}”</span>`:``}${txt}</div>`
+    +`<button class="btn" style="margin-top:10px" onclick="nextTurn()">${last?"결과 확인 ▶":"다음 ▶"}</button>`;
+  el2.querySelector('.fx').style.animation="popIn .25s ease both";
 }
+function nextTurn(){ G.t++; screenTurn(); }
 
 function traitAxis(label,neg,pos,val){ // val -N..+N → 위치 %
   const pos_=Math.max(0,Math.min(100, 50 + val*6));
@@ -688,6 +682,7 @@ function screenResult(){
   const painText = G.painPick || PAIN[(s.mp<40)?"낮은멘탈":low];
   const es = energyStyle(s.mp, G.burnout);
   const fitS=FIT[strongTop];
+  G.result={ch:ch,grade:grade,score:score,fitJob:fitS.job};
   const likeBlock = likeTop ? `
     <div class="insight like"><div class="h">❤️ 당신이 끌리는 일</div>
       <div class="big">${FIT[likeTop].job}</div>
@@ -722,12 +717,18 @@ function screenResult(){
 
     <div class="kv"><span>번아웃(멘탈·체력 소진)</span><b>${G.burnout}회</b></div>
     <div class="kv"><span>소요 시간</span><b>${(time/1000).toFixed(1)}초</b></div>
-    <div class="charrow" style="margin-top:16px">${charSVG(G.char,62,"cheer")}<div><div class="cnm">최종 능력치</div><div class="cln">20년간의 선택이 만든 ${G.nick}의 성적표</div></div></div>
+    <div class="charrow" style="margin-top:16px">${charSVG(G.char,62,"cheer")}<div><div class="cnm">최종 능력치</div><div class="cln">15번의 선택으로 완성한 ${G.nick}의 성적표</div></div></div>
     <canvas id="radarResult" width="620" height="400" class="radar"></canvas>
     <div class="stats hpmp">${statHpMp(s)}</div>
     <div class="insight" style="background:#eef4ff;border:1px solid #d6e0f2;margin-top:10px">
       <div class="h" style="color:var(--blue-d)">${es.e} 에너지 운용 — ${es.name}</div>
       <div style="font-size:13px;color:#4a5468">${es.desc}</div>
+    </div>
+    <div style="background:var(--yellow);border:2.5px solid var(--ink);border-radius:14px;padding:14px;margin:12px 0;box-shadow:2px 2px 0 var(--ink)">
+      <div style="font-weight:800;margin-bottom:3px">📸 결과 카드 만들기</div>
+      <div style="font-size:12px;color:#6b5a1a;margin-bottom:9px">이미지로 저장해 동료에게 자랑해 보세요!</div>
+      <div id="cardArea" style="margin-bottom:9px"></div>
+      <button class="btn blue" onclick="makeCard()">결과 카드 생성하기 ✨</button>
     </div>
     <button class="btn" onclick="screenStart()">🔄 다른 신입으로 다시 키우기</button>
     <div style="height:9px"></div>
@@ -739,7 +740,7 @@ function screenResult(){
     <div class="dex">${DEX_ORDER.map(k=>{
       const info=BASE_CHAR[k]||SPECIAL[k]; const got=dex[k];
       return `<div class="dexcell ${got?'got':'miss'}"><div class="de">${got?info.e:"❓"}</div>
-        ${got?(k==="한량"?"한량":(k==="균형"?"균형형":info.name)):"???"}${got?`<div style="font-size:10px;color:#8a94a8">×${got}</div>`:""}</div>`;
+        ${got?(k==="한량"?"여유러":(k==="균형"?"균형형":info.name)):"???"}${got?`<div style="font-size:10px;color:#8a94a8">×${got}</div>`:""}</div>`;
     }).join("")}</div>
   </div>
 
@@ -751,6 +752,51 @@ function screenResult(){
   drawRadar("radarResult", s);
 }
 function start2(){ newGame(G.nick,G.seed); screenTurn(); }
+function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function makeCard(){
+  if(!G||!G.result) return;
+  const r=G.result, s=G.stats, W=680, H=920;
+  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  const img=new Image();
+  img.onload=function(){
+    ctx.fillStyle="#f3ecdb"; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="#fffdf6"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=7;
+    roundRect(ctx,22,22,W-44,H-44,26); ctx.fill(); ctx.stroke();
+    ctx.textAlign="center";
+    ctx.fillStyle="#e8503a"; ctx.font="800 23px 'Malgun Gothic',sans-serif";
+    ctx.fillText(G.nick+"의 20년 후 배치 결과", W/2, 76);
+    ctx.fillStyle="#eaf0ff"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=5;
+    roundRect(ctx,W/2-110,96,220,210,24); ctx.fill(); ctx.stroke();
+    ctx.drawImage(img, W/2-90, 108, 180, 190);
+    ctx.fillStyle="#1c1a17"; ctx.font="800 40px 'Malgun Gothic',sans-serif";
+    ctx.fillText(r.ch.e+" "+r.ch.name, W/2, 366);
+    ctx.fillStyle="#1e50bb"; ctx.font="800 26px 'Malgun Gothic',sans-serif";
+    ctx.fillText(r.grade+"등급 · "+r.score.toLocaleString()+"점", W/2, 406);
+    ctx.fillStyle="#5a5347"; ctx.font="600 19px 'Malgun Gothic',sans-serif";
+    ctx.fillText("어울리는 일 · "+r.fitJob, W/2, 440);
+    const keys=STAT_KEYS, top=488;
+    keys.forEach(function(k,i){
+      const col=i%2, row=Math.floor(i/2);
+      const bx=64+col*312, by=top+row*72;
+      ctx.textAlign="left"; ctx.fillStyle="#1c1a17"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
+      ctx.fillText(k, bx, by);
+      ctx.textAlign="right"; ctx.fillText("+"+(s[k]-25), bx+252, by);
+      ctx.strokeStyle="#1c1a17"; ctx.lineWidth=2.5; ctx.fillStyle="#fff";
+      roundRect(ctx,bx,by+9,252,16,8); ctx.fill(); ctx.stroke();
+      ctx.fillStyle="#2f6fed"; const w=Math.max(6,Math.min(252,(s[k]-25)/30*252));
+      roundRect(ctx,bx,by+9,w,16,8); ctx.fill();
+    });
+    ctx.textAlign="center"; ctx.fillStyle="#8a7f6a"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
+    ctx.fillText("신입사원 메이커 · 20년 후의 나", W/2, H-42);
+    const url=cv.toDataURL('image/png');
+    document.getElementById('cardArea').innerHTML=
+      '<img src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
+     +'<a class="btn blue" download="신입사원메이커_'+G.nick+'.png" href="'+url+'" style="margin-top:8px;text-decoration:none;display:block;text-align:center;line-height:1.35">💾 이미지로 저장<br><span style="font-size:11px;font-weight:600;opacity:.85">(저장이 안 되면 이미지를 길게 눌러 저장)</span></a>';
+  };
+  img.onerror=function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; };
+  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(G.char,180,"cheer"));
+}
 
 function lbTable(seed,meId){
   const lb=loadLB(seed).slice(0,10);
