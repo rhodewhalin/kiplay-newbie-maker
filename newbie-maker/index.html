@@ -408,10 +408,10 @@ function newGame(nick,seed){
 function scoreOf(s,burnout){
   const vals=STAT_KEYS.map(k=>s[k]).sort((a,b)=>b-a);
   let A=0; vals.forEach((v,i)=>A+=v*(i<3?1.3:1.0));
-  const spec=vals[0]>=45?90:0;
-  const D=Math.max(s.hp*0.5+s.mp*0.6, spec);
-  const E=burnout*70;
-  return Math.max(0,Math.round(A*2.8 + D - E));
+  const spec=vals[0]>=45?90:0; // 특화 보너스
+  const E=burnout*80; // 번아웃(멘탈/체력 0 소진) 페널티
+  // 멘탈/체력 '잔량'은 점수에 넣지 않음 → 몸 사리는 게 이득이 되지 않게. 점수는 능력치 성장이 결정.
+  return Math.max(0,Math.round(A*2.7 + spec - E));
 }
 function gradeOf(sc){ return sc>=980?"S":sc>=880?"A":sc>=780?"B":sc>=680?"C":"D"; }
 
@@ -480,6 +480,12 @@ const RADAR_LABEL={기획력:"기획",소통력:"소통",행정력:"행정",디�
 function statHpMp(s){
   return `<div class="stat mp"><span>멘탈 <b>${s.mp}</b></span><div class="bar"><i style="width:${Math.max(0,s.mp)}%"></i></div></div>`
     +`<div class="stat hp"><span>체력 <b>${s.hp}</b></span><div class="bar"><i style="width:${Math.max(0,s.hp)}%"></i></div></div>`;
+}
+function energyStyle(mp, burnout){
+  if(burnout>0) return {e:"🥵",name:"과열 주의",desc:"에너지를 다 써버린 적이 "+burnout+"번. 열심히 한 만큼, 가끔은 쉬어가도 괜찮아요."};
+  if(mp>=60) return {e:"🌿",name:"페이스 조절형",desc:"지치지 않고 꾸준히 가는, 오래가는 스타일이에요."};
+  if(mp>=30) return {e:"⚖️",name:"균형형",desc:"쏟을 땐 쏟고 챙길 땐 챙기는, 균형 잡힌 스타일이에요."};
+  return {e:"🔥",name:"열정 몰입형",desc:"에너지를 아낌없이 쏟았네요. 제대로 불태우는 사람!"};
 }
 function drawRadar(id,s){
   const cv=document.getElementById(id); if(!cv||!cv.getContext)return;
@@ -575,6 +581,7 @@ function screenResult(){
   const myRank=saveScore(G.seed,entry);
 
   const painText = G.painPick || PAIN[(s.mp<40)?"낮은멘탈":low];
+  const es = energyStyle(s.mp, G.burnout);
   const fitS=FIT[strongTop];
   const likeBlock = likeTop ? `
     <div class="insight like"><div class="h">❤️ 당신이 끌리는 일</div>
@@ -613,6 +620,10 @@ function screenResult(){
     <h2 style="margin-top:16px">능력치 레이더</h2>
     <canvas id="radarResult" width="620" height="400" class="radar"></canvas>
     <div class="stats hpmp">${statHpMp(s)}</div>
+    <div class="insight" style="background:#eef4ff;border:1px solid #d6e0f2;margin-top:10px">
+      <div class="h" style="color:var(--blue-d)">${es.e} 에너지 운용 — ${es.name}</div>
+      <div style="font-size:13px;color:#4a5468">${es.desc}</div>
+    </div>
     <div class="row2">
       <button class="btn ghost" onclick="screenStart()">처음으로</button>
       <button class="btn ghost" onclick="start2rand()">🎲 새 문항</button>
