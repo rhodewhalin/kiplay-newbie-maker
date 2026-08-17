@@ -806,7 +806,7 @@ function makeCard(){
     ctx.fillText(G.nick+"의 20년 후 배치 결과", W/2, 76);
     ctx.fillStyle="#eaf0ff"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=5;
     roundRect(ctx,W/2-110,96,220,210,24); ctx.fill(); ctx.stroke();
-    ctx.drawImage(img, W/2-90, 108, 180, 190);
+    ctx.drawImage(img, W/2-93, 108, 186, 186);
     ctx.fillStyle="#1c1a17"; ctx.font="800 40px 'Malgun Gothic',sans-serif";
     ctx.fillText(r.ch.e+" "+r.ch.name, W/2, 366);
     ctx.fillStyle="#1e50bb"; ctx.font="800 26px 'Malgun Gothic',sans-serif";
@@ -833,7 +833,7 @@ function makeCard(){
      +'<a class="btn blue" download="신입사원메이커_'+G.nick+'.png" href="'+url+'" style="margin-top:8px;text-decoration:none;display:block;text-align:center;line-height:1.35">💾 이미지로 저장<br><span style="font-size:11px;font-weight:600;opacity:.85">(저장이 안 되면 이미지를 길게 눌러 저장)</span></a>';
   };
   img.onerror=function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; };
-  img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(G.char,180,"cheer"));
+  img.src = G.char.img ? G.char.img : ('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(G.char,180,"cheer")));
 }
 
 function lbTable(seed,meId){
