@@ -807,8 +807,11 @@ function makeCard(){
     ctx.fillStyle="#eaf0ff"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=5;
     roundRect(ctx,W/2-110,96,220,210,24); ctx.fill(); ctx.stroke();
     ctx.drawImage(img, W/2-93, 108, 186, 186);
-    ctx.fillStyle="#1c1a17"; ctx.font="800 40px 'Malgun Gothic',sans-serif";
-    ctx.fillText(r.ch.e+" "+r.ch.name, W/2, 366);
+    var nameStr=r.ch.e+" "+r.ch.name, nfs=40, nmaxW=W-108;
+    ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif";
+    while(ctx.measureText(nameStr).width>nmaxW && nfs>22){ nfs-=1; ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif"; }
+    ctx.fillStyle="#1c1a17";
+    ctx.fillText(nameStr, W/2, 366);
     ctx.fillStyle="#1e50bb"; ctx.font="800 26px 'Malgun Gothic',sans-serif";
     ctx.fillText(r.grade+"등급 · "+r.score.toLocaleString()+"점", W/2, 406);
     ctx.fillStyle="#5a5347"; ctx.font="600 19px 'Malgun Gothic',sans-serif";
