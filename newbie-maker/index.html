@@ -126,17 +126,22 @@
   .scene{position:relative;width:100%;border:2.5px solid var(--ink);border-radius:16px;overflow:hidden;
     background:#efe4c8 center/cover no-repeat;box-shadow:3px 3px 0 var(--ink)}
   .scene.play{aspect-ratio:16/8;margin-bottom:12px}
+  .scene.start{aspect-ratio:16/7;margin:2px 0 14px}
   .scene.result{aspect-ratio:16/9;margin:8px 0 0;border-bottom:none;border-bottom-left-radius:0;border-bottom-right-radius:0;box-shadow:none}
   .scene .who{position:absolute;left:0;bottom:0;width:100%;height:100%;
     display:flex;justify-content:center;align-items:flex-end;pointer-events:none}
   .scene .who img,.scene .who svg{width:auto;object-fit:contain;
     filter:drop-shadow(0 5px 4px rgba(0,0,0,.30));animation:bob 3.2s ease-in-out infinite}
-  .scene.play .who img,.scene.play .who svg{height:96%}
+  .scene.play .who img,.scene.play .who svg,.scene.start .who img,.scene.start .who svg{height:96%}
   .scene.result .who img,.scene.result .who svg{height:92%}
   .scene .tag{position:absolute;left:10px;top:9px;background:rgba(255,255,255,.93);border:2px solid var(--ink);
     border-radius:999px;padding:3px 12px;font-size:11.5px;font-weight:800;box-shadow:2px 2px 0 var(--ink)}
   .scene.result .shine{position:absolute;inset:0;pointer-events:none;
     background:radial-gradient(ellipse at 50% 118%,rgba(255,255,255,.4),transparent 62%)}
+  @keyframes gradePop{0%{opacity:0;transform:scale(.4) rotate(-8deg)}55%{opacity:1;transform:scale(1.22) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
+  @keyframes cnamePop{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
+  .charcard .grade{animation:gradePop .55s .45s cubic-bezier(.2,.9,.3,1.5) both}
+  .charcard .cname{animation:cnamePop .5s .15s ease both}
 </style>
 </head>
 <body>
@@ -460,7 +465,8 @@ function buildTurns(seed){
 /* ---------- 상태 ---------- */
 let G=null;
 let chosenChar=0;
-function selectChar(i){ chosenChar=i; document.querySelectorAll('.charopt').forEach((el,j)=>el.classList.toggle('on',j===i)); }
+function selectChar(i){ chosenChar=i; document.querySelectorAll('.charopt').forEach((el,j)=>el.classList.toggle('on',j===i));
+  var sw=document.getElementById('startWho'); if(sw) sw.innerHTML=charSVG(CHARS[i],140); }
 function newGame(nick,seed){
   const s={}; STAT_KEYS.forEach(k=>s[k]=START_STAT); s.hp=START_HPMP; s.mp=START_HPMP;
   const like={}; STAT_KEYS.forEach(k=>like[k]=0);
@@ -514,6 +520,10 @@ function screenStart(){
   const dex=loadDex(); const got=DEX_ORDER.filter(k=>dex[k]).length;
   el(`
   <div class="card">
+    <div class="scene start" style="background-image:url('${BG_IMG[0]}')">
+      <div class="tag">우리원 입사 첫날 ✨</div>
+      <div class="who" id="startWho">${charSVG(CHARS[chosenChar],140)}</div>
+    </div>
     <div class="badge">KIPI Playground · 프로토타입</div>
     <h1>신입사원을 키워라, <span class="spark">✨</span><br>20년 후가 <span style="color:var(--red)">결정된다!</span></h1>
     <p class="sub">우리원 신입이 되어 15번의 선택으로 쑥쑥 성장! 💪<br><b>내 강점 · 끌리는 일 · 힘든 이유</b>와 <b>일하는 성향</b>까지 알아보고, 나만의 캐릭터를 완성해요.</p>
@@ -716,7 +726,7 @@ function screenResult(){
   const painText = G.painPick || PAIN[(s.mp<40)?"낮은멘탈":low];
   const es = energyStyle(s.mp, G.burnout);
   const fitS=FIT[strongTop];
-  G.result={ch:ch,grade:grade,score:score,fitJob:fitS.job};
+  G.result={ch:ch,grade:grade,score:score,fitJob:fitS.job,bgIdx:bgIdx};
   const likeBlock = likeTop ? `
     <div class="insight like"><div class="h">❤️ 당신이 끌리는 일</div>
       <div class="big">${FIT[likeTop].job}</div>
@@ -791,52 +801,64 @@ function screenResult(){
 }
 function start2(){ newGame(G.nick,G.seed); screenTurn(); }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function loadImg(src){ return new Promise(function(res,rej){ var i=new Image(); i.onload=function(){res(i);}; i.onerror=function(){rej();}; i.src=src; }); }
 function makeCard(){
   if(!G||!G.result) return;
-  const r=G.result, s=G.stats, W=680, H=920;
-  const cv=document.createElement('canvas'); cv.width=W; cv.height=H;
-  const ctx=cv.getContext('2d');
-  const img=new Image();
-  img.onload=function(){
+  var r=G.result, s=G.stats, W=680, H=920;
+  var cv=document.createElement('canvas'); cv.width=W; cv.height=H;
+  var ctx=cv.getContext('2d');
+  var charSrc = G.char.img ? G.char.img : ('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(G.char,180,"cheer")));
+  var bgSrc = (typeof BG_IMG!=='undefined' && typeof r.bgIdx==='number' && BG_IMG[r.bgIdx]) ? BG_IMG[r.bgIdx] : null;
+  var jobs=[loadImg(charSrc)]; if(bgSrc) jobs.push(loadImg(bgSrc));
+  Promise.all(jobs).then(function(imgs){
+    var charImg=imgs[0], bgImg=imgs[1]||null;
     ctx.fillStyle="#f3ecdb"; ctx.fillRect(0,0,W,H);
     ctx.fillStyle="#fffdf6"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=7;
     roundRect(ctx,22,22,W-44,H-44,26); ctx.fill(); ctx.stroke();
     ctx.textAlign="center";
     ctx.fillStyle="#e8503a"; ctx.font="800 23px 'Malgun Gothic',sans-serif";
     ctx.fillText(G.nick+"의 20년 후 배치 결과", W/2, 76);
-    ctx.fillStyle="#eaf0ff"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=5;
-    roundRect(ctx,W/2-110,96,220,210,24); ctx.fill(); ctx.stroke();
-    ctx.drawImage(img, W/2-93, 108, 186, 186);
+    var bx0=44, by0=92, bw=W-88, bh=228, bBot=by0+bh;
+    ctx.save();
+    roundRect(ctx,bx0,by0,bw,bh,20); ctx.clip();
+    if(bgImg){
+      var sc=Math.max(bw/bgImg.width, bh/bgImg.height), dw=bgImg.width*sc, dh=bgImg.height*sc;
+      ctx.drawImage(bgImg, bx0+(bw-dw)/2, by0+(bh-dh)/2, dw, dh);
+    } else { ctx.fillStyle="#eaf0ff"; ctx.fillRect(bx0,by0,bw,bh); }
+    var grad=ctx.createLinearGradient(0,bBot-64,0,bBot);
+    grad.addColorStop(0,"rgba(255,253,246,0)"); grad.addColorStop(1,"rgba(255,253,246,.5)");
+    ctx.fillStyle=grad; ctx.fillRect(bx0,bBot-64,bw,64);
+    var chS=216; ctx.drawImage(charImg, W/2-chS/2, bBot-chS+8, chS, chS);
+    ctx.restore();
+    ctx.strokeStyle="#1c1a17"; ctx.lineWidth=4; roundRect(ctx,bx0,by0,bw,bh,20); ctx.stroke();
+    ctx.textAlign="center";
     var nameStr=r.ch.e+" "+r.ch.name, nfs=40, nmaxW=W-108;
     ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif";
     while(ctx.measureText(nameStr).width>nmaxW && nfs>22){ nfs-=1; ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif"; }
-    ctx.fillStyle="#1c1a17";
-    ctx.fillText(nameStr, W/2, 366);
+    ctx.fillStyle="#1c1a17"; ctx.fillText(nameStr, W/2, 374);
     ctx.fillStyle="#1e50bb"; ctx.font="800 26px 'Malgun Gothic',sans-serif";
-    ctx.fillText(r.grade+"등급 · "+r.score.toLocaleString()+"점", W/2, 406);
+    ctx.fillText(r.grade+"등급 · "+r.score.toLocaleString()+"점", W/2, 412);
     ctx.fillStyle="#5a5347"; ctx.font="600 19px 'Malgun Gothic',sans-serif";
-    ctx.fillText("어울리는 일 · "+r.fitJob, W/2, 440);
-    const keys=STAT_KEYS, top=488;
+    ctx.fillText("어울리는 일 · "+r.fitJob, W/2, 444);
+    var keys=STAT_KEYS, top=492;
     keys.forEach(function(k,i){
-      const col=i%2, row=Math.floor(i/2);
-      const bx=64+col*312, by=top+row*72;
+      var col=i%2, row=Math.floor(i/2);
+      var bx=64+col*312, by=top+row*72;
       ctx.textAlign="left"; ctx.fillStyle="#1c1a17"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
       ctx.fillText(k, bx, by);
       ctx.textAlign="right"; ctx.fillText("+"+(s[k]-25), bx+252, by);
       ctx.strokeStyle="#1c1a17"; ctx.lineWidth=2.5; ctx.fillStyle="#fff";
       roundRect(ctx,bx,by+9,252,16,8); ctx.fill(); ctx.stroke();
-      ctx.fillStyle="#2f6fed"; const w=Math.max(6,Math.min(252,(s[k]-25)/30*252));
+      ctx.fillStyle="#2f6fed"; var w=Math.max(6,Math.min(252,(s[k]-25)/30*252));
       roundRect(ctx,bx,by+9,w,16,8); ctx.fill();
     });
     ctx.textAlign="center"; ctx.fillStyle="#8a7f6a"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
     ctx.fillText("신입사원 메이커 · 20년 후의 나", W/2, H-42);
-    const url=cv.toDataURL('image/png');
+    var url=cv.toDataURL('image/png');
     document.getElementById('cardArea').innerHTML=
       '<img src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
      +'<a class="btn blue" download="신입사원메이커_'+G.nick+'.png" href="'+url+'" style="margin-top:8px;text-decoration:none;display:block;text-align:center;line-height:1.35">💾 이미지로 저장<br><span style="font-size:11px;font-weight:600;opacity:.85">(저장이 안 되면 이미지를 길게 눌러 저장)</span></a>';
-  };
-  img.onerror=function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; };
-  img.src = G.char.img ? G.char.img : ('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(charSVG(G.char,180,"cheer")));
+  }).catch(function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; });
 }
 
 function lbTable(seed,meId){
