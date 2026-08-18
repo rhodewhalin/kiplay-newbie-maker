@@ -832,10 +832,19 @@ function showTurnResult(ch,whisper,m){
   const last=(G.t+1>=G.turns.length);
   const el2=document.getElementById('turnResult');
   el2.innerHTML=`<div class="fx" style="margin-top:12px">${whisper?`<span class="rx">“${whisper}”</span>`:``}${txt}</div>`
-    +`<button class="btn" style="margin-top:10px" onclick="nextTurn()">${last?"결과 확인 ▶":"다음 ▶"}</button>`;
+    +`<button id="nextBtn" class="btn" style="margin-top:10px" onclick="nextTurn()">${last?"결과 확인 ▶":"다음 ▶"}</button>`;
   el2.querySelector('.fx').style.animation="popIn .25s ease both";
 }
 function nextTurn(){ G.t++; screenTurn(); }
+/* 스페이스/엔터로 '다음 ▶' 넘기기 (입력창에선 무시) */
+document.addEventListener('keydown', function(e){
+  var t=e.target;
+  if(t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+  if(e.code==='Space'||e.key===' '||e.code==='Enter'||e.key==='Enter'){
+    var nb=document.getElementById('nextBtn');
+    if(nb){ e.preventDefault(); nb.click(); }
+  }
+});
 
 function traitAxis(label,neg,pos,val){ // val -N..+N → 위치 %
   const pos_=Math.max(0,Math.min(100, 50 + val*6));
