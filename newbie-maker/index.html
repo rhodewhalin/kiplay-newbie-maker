@@ -146,6 +146,12 @@
     animation:evtPop .5s cubic-bezier(.2,.9,.3,1.6) both}
   @keyframes evtPop{0%{opacity:0;transform:rotate(-3deg) scale(.4)}60%{opacity:1;transform:rotate(-3deg) scale(1.12)}100%{transform:rotate(-3deg) scale(1)}}
   @media(max-width:560px){.scene.event .evtbanner{font-size:16px;padding:5px 13px}}
+  /* ---- 결과 전 두구두구 카드 ---- */
+  .revealcard{width:190px;aspect-ratio:3/4;margin:16px auto;background:var(--blue);border:3px solid var(--ink);border-radius:18px;box-shadow:5px 6px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;animation:revealShake 1.1s ease-in-out infinite}
+  .revealcard:hover{background:var(--blue-d)}
+  .revealcard .qmark{font-size:78px;font-weight:800;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.22);line-height:1}
+  .revealcard .rlabel{font-size:14px;font-weight:800;color:#fff;background:rgba(0,0,0,.2);border-radius:999px;padding:4px 14px}
+  @keyframes revealShake{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg) scale(1.03)}}
   @keyframes gradePop{0%{opacity:0;transform:scale(.4) rotate(-8deg)}55%{opacity:1;transform:scale(1.22) rotate(3deg)}100%{transform:scale(1) rotate(0)}}
   @keyframes cnamePop{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
   .charcard .grade{animation:gradePop .55s .45s cubic-bezier(.2,.9,.3,1.5) both}
@@ -635,7 +641,7 @@ function screenStart(){
       <div class="heroL">
         <div class="badge">AI로 만든 사내 게임</div>
         <h1>신입사원을 키워라,<br>20년 후가 <span style="color:var(--red)">결정된다!</span> <span class="spark">✨</span></h1>
-        <p class="sub">우리원 신입이 되어 15번의 선택으로 쑥쑥 성장!<br><b>강점·끌리는 일·힘든 이유</b>와 <b>일하는 성향</b>까지,<br>20년 후 <b>내 사원증</b>이 완성돼요.</p>
+        <p class="sub">우리원 신입이 되어 15번의 선택으로 쑥쑥 성장!<br><b>강점·끌리는 일·힘든 이유</b>와 <b>일하는 성향</b>까지,<br>20년 후의 <b>내 사원증</b>이 완성돼요.</p>
         <div class="todo">📌 오늘의 할 일 — 신입 키우기 (마감: 20년 후)</div>
       </div>
       <div class="heroR">
@@ -781,7 +787,7 @@ function charSVG(c, size, faceOverride){
 function bClass(g){return g==="kipi"?"kipi":(g==="event"?"event":"cat");}
 
 function screenTurn(){
-  if(G.t>=G.turns.length) return screenResult();
+  if(G.t>=G.turns.length) return screenReveal();
   const c=Q[G.turns[G.t]]; const pct=Math.round(G.t/G.turns.length*100);
   const scene = c.g==="event"
     ? `<div class="scene event" style="background-image:url('${BG_EVENT}')"><div class="evtbanner">⚡ 돌발 이벤트 발생!</div></div>`
@@ -837,6 +843,20 @@ function traitAxis(label,neg,pos,val){ // val -N..+N → 위치 %
     <div class="trbar"><div class="dot" style="left:${pos_}%"></div></div></div>`;
 }
 
+function screenReveal(){
+  el(`
+  <div class="card" style="text-align:center">
+    <div class="badge" style="background:var(--red)">🥁 두구두구…</div>
+    <h2 style="margin:12px 0 4px">15번의 선택, 끝!</h2>
+    <p class="sub" style="margin:0 0 4px">20년 후의 <b>${G.nick}</b>, 과연 어떤 모습일까요?</p>
+    <div class="revealcard" onclick="screenResult()">
+      <div class="qmark">?</div>
+      <div class="rlabel">🎴 카드 뒤집기</div>
+    </div>
+    <button class="btn" onclick="screenResult()">결과 확인하기 ▶</button>
+    <p class="muted">두근두근… 20년 후의 내 사원증이 완성됐어요!</p>
+  </div>`);
+}
 function screenResult(){
   const s=G.stats, tr=G.trait;
   const growth={}; STAT_KEYS.forEach(k=>growth[k]=s[k]-START_STAT);
@@ -906,7 +926,7 @@ function screenResult(){
       <div style="font-weight:800;margin-bottom:3px">📸 결과 카드 만들기</div>
       <div style="font-size:12px;color:#6b5a1a;margin-bottom:9px">이미지로 저장해 동료에게 자랑해 보세요!</div>
       <div id="cardArea" style="margin-bottom:9px"></div>
-      <button class="btn blue" onclick="makeCard()">결과 카드 생성하기 ✨</button>
+      <button id="genCardBtn" class="btn blue" onclick="makeCard()">결과 카드 생성하기 ✨</button>
     </div>
     <button class="btn" onclick="screenStart()">🔄 다른 신입으로 다시 키우기</button>
     <div style="height:9px"></div>
@@ -988,6 +1008,7 @@ function makeCard(){
     document.getElementById('cardArea').innerHTML=
       '<img src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
      +'<a class="btn blue" download="신입사원메이커_'+G.nick+'.png" href="'+url+'" style="margin-top:8px;text-decoration:none;display:block;text-align:center;line-height:1.35">💾 이미지로 저장<br><span style="font-size:11px;font-weight:600;opacity:.85">(저장이 안 되면 이미지를 길게 눌러 저장)</span></a>';
+    var gb=document.getElementById('genCardBtn'); if(gb) gb.style.display='none';
   }).catch(function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; });
 }
 
