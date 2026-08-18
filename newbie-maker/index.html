@@ -894,7 +894,6 @@ function screenResult(){
       <div class="cname">${ch.e} ${ch.name}!</div>
       <div class="cdesc">${ch.desc}</div>
     </div>
-    <div style="font-size:12px;color:#7a6a2e;background:#fff7d6;border:1.5px dashed #e0c66a;border-radius:10px;padding:10px 13px;margin:12px 0 2px;line-height:1.55;text-align:center">💡 <b>점수는 '얼마나 잘 키웠나'를 보여주는 육성 게임 점수</b>예요.<br>성향엔 정답이 없으니 편하게 즐기세요 — 다시 하면 쑥쑥 올라요!</div>
 
     <h2>나의 성향</h2>
     <div class="traits">
@@ -944,7 +943,7 @@ function screenResult(){
   <div class="card">
     <h2>🏆 리더보드 (${G.seed})</h2>
     ${lbTable(G.seed,entry.id)}
-    <p class="muted">어느 캐릭터도 더 낫고 나쁨은 없어요 — 서로 강점이 다를 뿐이에요!<br>※ 프로토타입은 이 브라우저에만 저장됩니다.</p>
+    <p class="muted">💡 점수는 '얼마나 잘 키웠나'를 보여주는 <b>육성 게임 점수</b>예요. 성향·캐릭터엔 정답도 우열도 없으니 편하게 즐기세요 — 다시 하면 쑥쑥 올라요!<br>※ 프로토타입은 이 브라우저에만 저장됩니다.</p>
   </div>`);
   drawRadar("radarResult", s);
 }
