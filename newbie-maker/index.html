@@ -634,9 +634,7 @@ function screenStart(){
     <div class="charpick">${CHARS.map((c,i)=>`<button type="button" class="charopt ${i===chosenChar?'on':''}" onclick="selectChar(${i})"><div class="cvg">${charSVG(c,66)}</div><div class="cnm">${c.tag}</div><div class="cln">${c.line}</div></button>`).join("")}</div>
     <label>대회 코드 <span style="font-weight:400;color:#8a94a8">(있으면 입력 · 없으면 매번 다른 문항)</span></label>
     <input id="seed" type="text" maxlength="24" placeholder="대회 날 받은 코드가 있으면 입력" />
-    <div style="height:14px"></div>
-    <button class="btn" onclick="start()">입사 지원하기 ▶</button>
-    <p class="muted">문항 ${Q.length}개 중 15개(회사현안6·성향7·돌발2) · 캐릭터 도감 ${got}/${DEX_ORDER.length}<br>그냥 입사하면 <b>매번 다른 문항</b>, 대회 코드를 넣으면 <b>같은 문항으로 공정 경쟁</b>이에요.</p>
+    <p class="muted">문항 ${Q.length}개 중 15개(회사현안6·성향7·돌발2) · 캐릭터 도감 ${got}/${DEX_ORDER.length}<br>그냥 입사하면 <b>매번 다른 문항</b>, 대회 코드를 넣으면 <b>같은 문항으로 공정 경쟁</b>이에요.<br>이름·얼굴을 정했다면 아래 <b>‘지금 시작하기’</b>로 입사! 👇</p>
   </div>
 
   <div class="card">
@@ -649,7 +647,6 @@ function screenStart(){
     <p class="sub" style="margin:0">결과는 재미용이에요. 인사팀은 이 결과를 모릅니다. (진짜로)</p>
     <div style="height:12px"></div>
     <button class="btn blue" onclick="start()">지금 시작하기 →</button>
-    <div class="disc">본 결과는 재미용 성향 진단이에요. 실제 인사평가·부서 배치·승진과는 아무 관련이 없어요. 마음 편히 즐겨 주세요!</div>
   </div>
   ${loadLB(DEFAULT_SEED).length?`<div class="card"><h2>🏆 대회 리더보드 (${DEFAULT_SEED})</h2>${lbTable(DEFAULT_SEED,null)}</div>`:``}
   `);
