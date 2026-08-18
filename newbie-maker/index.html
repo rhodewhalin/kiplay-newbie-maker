@@ -142,6 +142,41 @@
   @keyframes cnamePop{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}
   .charcard .grade{animation:gradePop .55s .45s cubic-bezier(.2,.9,.3,1.5) both}
   .charcard .cname{animation:cnamePop .5s .15s ease both}
+  /* ---- 사원증(ID badge) ---- */
+  .idwrap{display:flex;justify-content:center;padding:4px 0}
+  .idcard{position:relative;width:198px;background:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:5px 6px 0 var(--ink);padding-bottom:13px}
+  .idcard .clip{width:42px;height:13px;margin:10px auto 4px;background:#cdd3db;border:2.5px solid var(--ink);border-radius:5px;position:relative}
+  .idcard .clip:after{content:"";position:absolute;left:50%;top:3.5px;transform:translateX(-50%);width:16px;height:3px;background:var(--ink);border-radius:2px}
+  .idcard .idhead{margin:0 12px;padding:3px 0;text-align:center;font-size:10.5px;font-weight:800;color:#fff;background:var(--tc,#8a94a8);border:2.5px solid var(--ink);border-radius:8px;letter-spacing:.5px}
+  .idcard .idphoto{margin:9px 14px 0;aspect-ratio:1/1;border:2.5px solid var(--ink);border-radius:12px;overflow:hidden;background:#eef2f8;display:flex;align-items:flex-end;justify-content:center}
+  .idcard .idphoto img,.idcard .idphoto svg{width:98%;height:98%;object-fit:contain}
+  .idcard.plain .idphoto{background:#e9edf3}
+  .idcard.plain .idphoto img,.idcard.plain .idphoto svg{filter:grayscale(1) contrast(.96) opacity(.9)}
+  .idcard .idname{text-align:center;font-size:17px;font-weight:800;margin-top:9px}
+  .idcard .idrole{text-align:center;font-size:12px;font-weight:800;color:var(--tc,#8a94a8);margin-top:2px;min-height:15px;padding:0 8px;line-height:1.3}
+  .idcard .idgrade{display:block;width:max-content;margin:8px auto 0;background:var(--yellow);border:2.5px solid var(--ink);border-radius:999px;padding:2px 13px;font-weight:800;font-size:13.5px;transform:rotate(-4deg);box-shadow:2px 2px 0 var(--ink)}
+  .idcard .idno{text-align:center;font-size:9.5px;color:var(--mut);margin-top:7px;letter-spacing:1px}
+  .idcard.full{animation:badgePop .6s cubic-bezier(.2,.9,.3,1.5) both}
+  @keyframes badgePop{0%{opacity:0;transform:scale(.72) rotate(-6deg)}60%{opacity:1;transform:scale(1.04) rotate(2deg)}100%{transform:none}}
+  /* ---- 히어로 ---- */
+  .hero .herogrid{display:grid;grid-template-columns:1fr 210px;gap:16px;align-items:center}
+  .hero h1{margin:6px 0 6px}
+  .hero .todo{display:inline-block;margin-top:10px;background:var(--yellow);border:2.5px solid var(--ink);border-radius:10px;padding:6px 12px;font-size:12.5px;font-weight:800;box-shadow:2px 2px 0 var(--ink)}
+  @media(max-width:560px){.hero .herogrid{grid-template-columns:1fr}.hero .heroR{order:-1}}
+  /* ---- 5단계 스트립 ---- */
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+  .stepc{background:#fff;border:2.5px solid var(--ink);border-radius:12px;padding:9px 8px;box-shadow:2px 2px 0 var(--ink)}
+  .stepc .sn{font-size:11px;font-weight:800;color:var(--mut)}
+  .stepc .st{font-size:12.5px;font-weight:800;margin-top:3px}
+  .stepc .sd{font-size:10px;color:var(--mut);margin-top:2px;line-height:1.35}
+  @media(max-width:560px){.steps{grid-template-columns:1fr 1fr}}
+  /* ---- CTA 밴드 + 결과 히어로 ---- */
+  .ctaband{text-align:center;background:var(--yellow);border:2.5px solid var(--ink);border-radius:16px;padding:20px 16px;box-shadow:4px 4px 0 var(--ink)}
+  .ctaband h2{margin:0 0 6px}
+  .ctaband .disc{font-size:11px;color:#6b5a1a;margin-top:12px;line-height:1.5}
+  .resulthero{position:relative;border:2.5px solid var(--ink);border-radius:16px 16px 0 0;border-bottom:none;overflow:hidden;background:#efe4c8 center/cover no-repeat;padding:20px 0 24px;display:flex;justify-content:center}
+  .resulthero .shine{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 120%,rgba(255,255,255,.35),transparent 60%)}
+  .resulthero .idwrap{position:relative;z-index:1}
 </style>
 </head>
 <body>
@@ -505,7 +540,7 @@ function buildTurns(seed){
 let G=null;
 let chosenChar=0;
 function selectChar(i){ chosenChar=i; document.querySelectorAll('.charopt').forEach((el,j)=>el.classList.toggle('on',j===i));
-  var sw=document.getElementById('startWho'); if(sw) sw.innerHTML=charSVG(CHARS[i],140); }
+  renderHeroBadge(); }
 function newGame(nick,seed){
   const s={}; STAT_KEYS.forEach(k=>s[k]=START_STAT); s.hp=START_HPMP; s.mp=START_HPMP;
   const like={}; STAT_KEYS.forEach(k=>like[k]=0);
@@ -555,26 +590,66 @@ const app=document.getElementById("app");
 function el(h){app.innerHTML=h;}
 const DEFAULT_SEED="KIPI-2026-R1";
 
+const TYPE_COLOR={기획력:"#2f6fed",소통력:"#e8503a",행정력:"#0f9d78",디지털:"#6c5ce7",조직이해도:"#e6892b",창의력:"#e84393",균형:"#e6892b",한량:"#3b9bd6"};
+function idBadge(char, o){ o=o||{};
+  var plain=!!o.plain, tc=o.color||"#8a94a8";
+  return `<div class="idwrap"><div class="idcard ${plain?'plain':'full'}" style="--tc:${tc}">
+    <div class="clip"></div>
+    <div class="idhead">한국특허정보원</div>
+    <div class="idphoto">${charSVG(char,120)}</div>
+    <div class="idname"${o.nameId?` id="${o.nameId}"`:''}>${o.name||'수습사원'}</div>
+    <div class="idrole">${o.role||(plain?'— 배치 예정 —':'')}</div>
+    ${o.grade?`<div class="idgrade">${o.grade}</div>`:''}
+    <div class="idno">${o.no||'KIPI · NEWBIE'}</div>
+  </div></div>`;
+}
+function heroBadgeHTML(){ var el2=document.getElementById('nick'); var nick=(el2&&el2.value||'').trim();
+  return idBadge(CHARS[chosenChar],{plain:true,name:nick||'수습사원',nameId:'heroName'}); }
+function renderHeroBadge(){ var h=document.getElementById('heroBadge'); if(h) h.innerHTML=heroBadgeHTML(); }
+function updateBadgeName(v){ var n=document.getElementById('heroName'); if(n) n.textContent=(v||'').trim()||'수습사원'; }
 function screenStart(){
   const dex=loadDex(); const got=DEX_ORDER.filter(k=>dex[k]).length;
+  const STEPS=[
+    {n:"01",t:"입사",d:"이름·얼굴 정하고 첫 출근"},
+    {n:"02",t:"업무 퀴즈",d:"회사 현안, 당신의 선택은?"},
+    {n:"03",t:"성향 질문",d:"정답 없음. 직장 본능이 기록됨"},
+    {n:"04",t:"돌발 이벤트",d:"예측불가 사건에 어떻게?"},
+    {n:"05",t:"20년 후",d:"수습 딱지 떼고 정규 사원증 공개"}
+  ];
   el(`
-  <div class="card">
-    <div class="scene start" style="background-image:url('${BG_IMG[0]}')">
-      <div class="tag">우리원 입사 첫날 ✨</div>
-      <div class="who" id="startWho">${charSVG(CHARS[chosenChar],140)}</div>
+  <div class="card hero">
+    <div class="herogrid">
+      <div class="heroL">
+        <div class="badge">AI로 만든 사내 게임</div>
+        <h1>신입사원을 키워라,<br>20년 후가 <span style="color:var(--red)">결정된다!</span> <span class="spark">✨</span></h1>
+        <p class="sub">우리원 신입이 되어 15번의 선택으로 쑥쑥 성장! <b>강점·끌리는 일·힘든 이유</b>와 <b>일하는 성향</b>까지, 20년 후 <b>내 사원증</b>이 완성돼요.</p>
+        <div class="todo">📌 오늘의 할 일 — 신입 키우기 (마감: 20년 후)</div>
+      </div>
+      <div class="heroR"><div id="heroBadge">${idBadge(CHARS[chosenChar],{plain:true,name:"수습사원",nameId:"heroName"})}</div></div>
     </div>
-    <div class="badge">KIPI Playground · 프로토타입</div>
-    <h1>신입사원을 키워라, <span class="spark">✨</span><br>20년 후가 <span style="color:var(--red)">결정된다!</span></h1>
-    <p class="sub">우리원 신입이 되어 15번의 선택으로 쑥쑥 성장! 💪<br><b>내 강점 · 끌리는 일 · 힘든 이유</b>와 <b>일하는 성향</b>까지 알아보고, 나만의 캐릭터를 완성해요.</p>
-    <label>닉네임</label>
-    <input id="nick" type="text" maxlength="12" placeholder="예: 혜연" />
-    <label>내 캐릭터 고르기</label>
-    <div class="charpick">${CHARS.map((c,i)=>`<button type="button" class="charopt ${i===chosenChar?'on':''}" onclick="selectChar(${i})"><div class="cvg">${charSVG(c,72)}</div><div class="cnm">${c.tag}</div><div class="cln">${c.line}</div></button>`).join("")}</div>
+    <div style="border-top:2px dashed #cabfa4;margin:16px 0 12px"></div>
+    <label>닉네임 <span style="font-weight:400;color:#8a94a8">(사원증에 새겨져요)</span></label>
+    <input id="nick" type="text" maxlength="12" placeholder="예: 혜연" oninput="updateBadgeName(this.value)" />
+    <label>내 얼굴 고르기 <span style="font-weight:400;color:#8a94a8">(위 사원증이 바뀌어요)</span></label>
+    <div class="charpick">${CHARS.map((c,i)=>`<button type="button" class="charopt ${i===chosenChar?'on':''}" onclick="selectChar(${i})"><div class="cvg">${charSVG(c,66)}</div><div class="cnm">${c.tag}</div><div class="cln">${c.line}</div></button>`).join("")}</div>
     <label>대회 코드 <span style="font-weight:400;color:#8a94a8">(있으면 입력 · 없으면 매번 다른 문항)</span></label>
     <input id="seed" type="text" maxlength="24" placeholder="대회 날 받은 코드가 있으면 입력" />
     <div style="height:14px"></div>
-    <button class="btn" onclick="start()">입사하기 ▶</button>
+    <button class="btn" onclick="start()">입사 지원하기 ▶</button>
     <p class="muted">문항 ${Q.length}개 중 15개(회사현안6·성향7·돌발2) · 캐릭터 도감 ${got}/${DEX_ORDER.length}<br>그냥 입사하면 <b>매번 다른 문항</b>, 대회 코드를 넣으면 <b>같은 문항으로 공정 경쟁</b>이에요.</p>
+  </div>
+
+  <div class="card">
+    <h2>입사부터 엔딩까지, <span style="color:var(--blue-d)">20년 축지 플레이</span></h2>
+    <div class="steps">${STEPS.map(s=>`<div class="stepc"><div class="sn">${s.n}</div><div class="st">${s.t}</div><div class="sd">${s.d}</div></div>`).join("")}</div>
+  </div>
+
+  <div class="card ctaband">
+    <h2>자, 이제 사원증을 목에 걸 시간 🪪</h2>
+    <p class="sub" style="margin:0">결과는 재미용이에요. 인사팀은 이 결과를 모릅니다. (진짜로)</p>
+    <div style="height:12px"></div>
+    <button class="btn blue" onclick="start()">지금 시작하기 →</button>
+    <div class="disc">본 결과는 재미용 성향 진단이에요. 실제 인사평가·부서 배치·승진과는 아무 관련이 없어요. 마음 편히 즐겨 주세요!</div>
   </div>
   ${loadLB(DEFAULT_SEED).length?`<div class="card"><h2>🏆 대회 리더보드 (${DEFAULT_SEED})</h2>${lbTable(DEFAULT_SEED,null)}</div>`:``}
   `);
@@ -774,16 +849,15 @@ function screenResult(){
 
   el(`
   <div class="card">
-    <div class="badge">📋 ${G.nick}의 20년 후 배치 결과</div>
-    <div class="scene result" style="background-image:url('${BG_IMG[bgIdx]}')">
+    <div class="badge">🎉 20년 후, ${G.nick}의 정규 발령!</div>
+    <div class="resulthero" style="background-image:url('${BG_IMG[bgIdx]}')">
       <div class="shine"></div>
-      <div class="who">${charSVG(G.char,230,"cheer")}</div>
+      ${idBadge(G.char,{name:G.nick,role:ch.e+" "+ch.name,grade:grade+"등급",color:TYPE_COLOR[ch.id]||"#2f6fed",no:"KIPI · "+score.toLocaleString()+" P"})}
     </div>
     <div class="charcard" style="border-top-left-radius:0;border-top-right-radius:0;margin-top:0">
-      <div class="cintro">입사 20년 차 — 마침내 발표된 배치는…</div>
+      <div class="cintro">수습 딱지를 떼고, 마침내…</div>
       <div class="cname">${ch.e} ${ch.name}!</div>
       <div class="cdesc">${ch.desc}</div>
-      <div class="grade">${grade}등급 · ${score.toLocaleString()}점</div>
     </div>
 
     <h2>나의 성향</h2>
