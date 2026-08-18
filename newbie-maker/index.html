@@ -209,7 +209,7 @@
    2) 성향 축 3개: social(내향-↔외향+) / novelty(안정-↔변화+) / belonging(자유-↔조직+)
    3) 결과 3분리: 💪잘하는 업무 / ❤️끌리는 업무 / 💢힘든 이유
    4) 캐릭터 판정: (강점 base 7종 + 성향 프리픽스) + 특수(한량/균형) → 균형형 쏠림 해결
-   5) 점수 등급제 S/A/B/C/D (우열 아닌 '완성도' 관점) + 캐릭터 도감
+   5) 점수(랭킹용) + 등급 별명(GRADE_LABEL: 전설의 인재~무한 잠재력, S/A/B/C/D 대체) + 캐릭터 도감
    6) 문항 52개(kipi19·psych24·event9), 기관소개 자료 기반 KIPI 6 + 끌리는일 KIPI판 1
    ============================================================ */
 
@@ -569,6 +569,8 @@ function scoreOf(s,burnout){
   return Math.max(0,Math.round(A*2.7 + spec - E));
 }
 function gradeOf(sc){ return sc>=980?"S":sc>=880?"A":sc>=780?"B":sc>=680?"C":"D"; }
+const GRADE_LABEL={S:"🌟 전설의 인재",A:"🏆 에이스 사원",B:"💪 듬직한 일꾼",C:"🌱 성장 중인 새싹",D:"✨ 무한 잠재력"};
+const GRADE_EMOJI={S:"🌟",A:"🏆",B:"💪",C:"🌱",D:"✨"};
 
 /* ---------- 캐릭터 판정 ---------- */
 function decideChar(growth, trait){
@@ -866,13 +868,14 @@ function screenResult(){
     <div class="badge">🎉 20년 후, ${G.nick}의 사원증 공개!</div>
     <div class="resulthero" style="background-image:url('${BG_IMG[bgIdx]}')">
       <div class="shine"></div>
-      ${idBadge(G.char,{name:G.nick,role:ch.e+" "+ch.name,grade:grade+"등급",color:TYPE_COLOR[ch.id]||"#2f6fed",no:"KIPI · "+score.toLocaleString()+" P"})}
+      ${idBadge(G.char,{name:G.nick,role:ch.e+" "+ch.name,grade:GRADE_LABEL[grade],color:TYPE_COLOR[ch.id]||"#2f6fed",no:"KIPI · "+score.toLocaleString()+" P"})}
     </div>
     <div class="charcard" style="border-top-left-radius:0;border-top-right-radius:0;margin-top:0">
       <div class="cintro">수많은 선택이 쌓여, 20년 후 당신은…</div>
       <div class="cname">${ch.e} ${ch.name}!</div>
       <div class="cdesc">${ch.desc}</div>
     </div>
+    <div style="font-size:12px;color:#7a6a2e;background:#fff7d6;border:1.5px dashed #e0c66a;border-radius:10px;padding:10px 13px;margin:12px 0 2px;line-height:1.55;text-align:center">💡 <b>등급·점수는 '얼마나 잘 키웠나'를 보는 육성 게임 점수</b>예요. 성향엔 정답이 없으니 편하게 즐기세요 — 다시 하면 쑥쑥 올라요!</div>
 
     <h2>나의 성향</h2>
     <div class="traits">
@@ -964,7 +967,7 @@ function makeCard(){
     while(ctx.measureText(nameStr).width>nmaxW && nfs>22){ nfs-=1; ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif"; }
     ctx.fillStyle="#1c1a17"; ctx.fillText(nameStr, W/2, 374);
     ctx.fillStyle="#1e50bb"; ctx.font="800 26px 'Malgun Gothic',sans-serif";
-    ctx.fillText(r.grade+"등급 · "+r.score.toLocaleString()+"점", W/2, 412);
+    ctx.fillText(GRADE_LABEL[r.grade]+" · "+r.score.toLocaleString()+"점", W/2, 412);
     ctx.fillStyle="#5a5347"; ctx.font="600 19px 'Malgun Gothic',sans-serif";
     ctx.fillText("어울리는 일 · "+r.fitJob, W/2, 444);
     var keys=STAT_KEYS, top=492;
@@ -991,9 +994,9 @@ function makeCard(){
 function lbTable(seed,meId){
   const lb=loadLB(seed).slice(0,10);
   if(!lb.length) return `<p class="sub">아직 기록이 없습니다. 첫 주자가 되어보세요!</p>`;
-  return `<table><tr><th class="rank">#</th><th>닉네임</th><th>등급</th><th>캐릭터</th></tr>
+  return `<table><tr><th class="rank">#</th><th>닉네임</th><th>점수</th><th>캐릭터</th></tr>
     ${lb.map((e,i)=>`<tr class="${e.id===meId?'me':''}"><td class="rank">${i+1}</td>
-      <td>${e.nick}</td><td><b>${e.grade||"-"}</b> ${e.score.toLocaleString()}</td>
+      <td>${e.nick}</td><td>${GRADE_EMOJI[e.grade]||""} <b>${e.score.toLocaleString()}</b></td>
       <td style="font-size:12px">${e.char||e.ending||"-"}</td></tr>`).join("")}
   </table>`;
 }
