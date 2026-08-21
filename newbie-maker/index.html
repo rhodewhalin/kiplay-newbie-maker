@@ -1012,10 +1012,23 @@ function makeCard(){
     ctx.textAlign="center"; ctx.fillStyle="#8a7f6a"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
     ctx.fillText("신입사원 메이커 · 20년 후의 나", W/2, H-42);
     var url=cv.toDataURL('image/png');
+    var fname='신입사원메이커_'+G.nick+'.png';
     document.getElementById('cardArea').innerHTML=
-      '<img src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
-     +'<a class="btn blue" download="신입사원메이커_'+G.nick+'.png" href="'+url+'" style="margin-top:8px;text-decoration:none;display:block;text-align:center;line-height:1.35">💾 이미지로 저장<br><span style="font-size:11px;font-weight:600;opacity:.85">(저장이 안 되면 이미지를 길게 눌러 저장)</span></a>';
+      '<img id="cardImg" src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
+     +'<button id="saveCardBtn" class="btn blue" style="margin-top:8px;width:100%">💾 이미지 저장</button>'
+     +'<div style="font-size:11px;color:#6b5a1a;margin-top:6px;text-align:center;line-height:1.4">저장이 안 되면 <b>위 카드 이미지를 꾹 눌러</b> 저장하세요 (휴대폰)</div>';
     var gb=document.getElementById('genCardBtn'); if(gb) gb.style.display='none';
+    var sb=document.getElementById('saveCardBtn');
+    function dlCard(){ var a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); }
+    sb.onclick=dlCard;
+    if(cv.toBlob){ cv.toBlob(function(blob){
+      if(!blob) return;
+      var file; try{ file=new File([blob],fname,{type:'image/png'}); }catch(e){ return; }
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        sb.textContent='💾 이미지 저장 / 공유';
+        sb.onclick=function(){ navigator.share({files:[file],title:'신입사원 메이커 결과',text:G.nick+'의 20년 후 사원증!'}).catch(function(){}); };
+      }
+    },'image/png'); }
   }).catch(function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; });
 }
 
