@@ -1018,16 +1018,24 @@ function makeCard(){
      +'<button id="saveCardBtn" class="btn blue" style="margin-top:8px;width:100%">💾 이미지 저장</button>'
      +'<div style="font-size:11px;color:#6b5a1a;margin-top:6px;text-align:center;line-height:1.4">저장이 안 되면 <b>위 카드 이미지를 꾹 눌러</b> 저장하세요 (휴대폰)</div>';
     var gb=document.getElementById('genCardBtn'); if(gb) gb.style.display='none';
-    var sb=document.getElementById('saveCardBtn');
+    var sb=document.getElementById('saveCardBtn'), blobRef=null, fileRef=null;
     function dlCard(){ var a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); }
-    sb.onclick=dlCard;
+    function fallbackSave(){
+      if(fileRef && navigator.canShare && navigator.canShare({files:[fileRef]})){
+        navigator.share({files:[fileRef],title:'신입사원 메이커 결과',text:G.nick+'의 20년 후 사원증!'}).catch(function(){ dlCard(); });
+      } else { dlCard(); }
+    }
+    sb.onclick=function(){
+      if(window.claude && typeof window.claude.use==='function' && blobRef){
+        window.claude.use('downloads').then(function(d){
+          if(d){ d.save({filename:fname,data:blobRef}).catch(function(){ fallbackSave(); }); } else { fallbackSave(); }
+        }).catch(function(){ fallbackSave(); });
+      } else { fallbackSave(); }
+    };
     if(cv.toBlob){ cv.toBlob(function(blob){
-      if(!blob) return;
-      var file; try{ file=new File([blob],fname,{type:'image/png'}); }catch(e){ return; }
-      if(navigator.canShare && navigator.canShare({files:[file]})){
-        sb.textContent='💾 이미지 저장 / 공유';
-        sb.onclick=function(){ navigator.share({files:[file],title:'신입사원 메이커 결과',text:G.nick+'의 20년 후 사원증!'}).catch(function(){}); };
-      }
+      if(!blob) return; blobRef=blob;
+      try{ fileRef=new File([blob],fname,{type:'image/png'}); }catch(e){}
+      if(navigator.canShare && fileRef && navigator.canShare({files:[fileRef]})){ sb.textContent='💾 이미지 저장 / 공유'; }
     },'image/png'); }
   }).catch(function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; });
 }
