@@ -811,7 +811,10 @@ function screenTurn(){
   el(`
   <div class="card">
     ${scene}
-    <div style="font-size:13px;font-weight:800;margin:0 0 8px">${G.nick} <span style="color:var(--mut);font-weight:600">· ${G.char.tag}</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin:0 0 8px">
+      ${G.t>0?`<button class="btn ghost" onclick="goBack()" style="width:auto;padding:5px 11px;font-size:12px;box-shadow:2px 2px 0 var(--ink)">◀ 이전</button>`:``}
+      <div style="font-size:13px;font-weight:800">${G.nick} <span style="color:var(--mut);font-weight:600">· ${G.char.tag}</span></div>
+    </div>
     <div class="prog"><i style="width:${pct}%"></i></div>
     <span class="badge ${bClass(c.g)}">${c.cat}</span>
     <h2 style="min-height:46px">${c.q}</h2>
@@ -823,6 +826,7 @@ function screenTurn(){
 
 function choose(i){
   const c=Q[G.turns[G.t]]; const o=c.opts[i]; const ch=[];
+  if(!G.snap)G.snap=[]; G.snap[G.t]={stats:Object.assign({},G.stats),like:Object.assign({},G.like),trait:Object.assign({},G.trait),painPick:G.painPick,burnout:G.burnout};
   if(c.m==="str" && o.eff) applyEff(o.eff,ch);
   if(c.m==="int" && o.like){ for(const k in o.like){ G.like[k]+=o.like[k]; ch.push([k,"it",o.like[k]]); } }
   if(c.m==="stress" && o.pain){ G.painPick=o.pain; ch.push(["나를 지치게 하는 걸 알았어요","note",0]); }
@@ -834,6 +838,15 @@ function choose(i){
   if(G.stats.mp<=0||G.stats.hp<=0){ G.burnout++; G.stats.mp=clamp(G.stats.mp+20); G.stats.hp=clamp(G.stats.hp+20); }
   G.log.push({q:G.turns[G.t],c:i});
   showTurnResult(ch,o.whisper,c.m);
+}
+function goBack(){
+  if(!G || G.t<=0) return;
+  if(pendingAdvance){ pendingAdvance=false; clearTimeout(advTimer); advTimer=null; var fp=document.querySelector('.fxpop'); if(fp) fp.remove(); }
+  G.t--;
+  var s0=G.snap && G.snap[G.t];
+  if(s0){ G.stats=Object.assign({},s0.stats); G.like=Object.assign({},s0.like); G.trait=Object.assign({},s0.trait); G.painPick=s0.painPick; G.burnout=s0.burnout; }
+  if(G.log && G.log.length) G.log.pop();
+  screenTurn();
 }
 function applyEff(eff,ch){ for(const k in eff){ if(STAT_KEYS.includes(k)){ const d=Math.round(eff[k]*1.8); G.stats[k]=Math.max(0,G.stats[k]+d); if(d) ch.push([k,d>0?"up":"dn",Math.abs(d)]); } } }
 function clamp(v){return Math.max(0,Math.min(100,v));}
