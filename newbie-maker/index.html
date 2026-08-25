@@ -829,6 +829,7 @@ function choose(i){
 function applyEff(eff,ch){ for(const k in eff){ if(STAT_KEYS.includes(k)){ const d=Math.round(eff[k]*1.8); G.stats[k]=Math.max(0,G.stats[k]+d); if(d) ch.push([k,d>0?"up":"dn",Math.abs(d)]); } } }
 function clamp(v){return Math.max(0,Math.min(100,v));}
 
+let advTimer=null, pendingAdvance=false;
 function showTurnResult(ch,whisper,m){
   document.querySelectorAll('.choice').forEach(function(b){b.disabled=true;b.style.opacity=".5";b.style.pointerEvents="none";b.style.boxShadow="none";});
   const txt=ch.length?ch.map(function(c){
@@ -839,10 +840,13 @@ function showTurnResult(ch,whisper,m){
   const last=(G.t+1>=G.turns.length);
   const el2=document.getElementById('turnResult');
   el2.innerHTML=`<div class="fx" style="margin-top:12px">${whisper?`<span class="rx">“${whisper}”</span>`:``}${txt}</div>`
-    +`<button id="nextBtn" class="btn" style="margin-top:10px" onclick="nextTurn()">${last?"결과 확인 ▶":"다음 ▶"}</button>`;
+    +`<div id="nextBtn" onclick="nextTurn()" style="margin-top:12px;text-align:center;font-size:12.5px;font-weight:800;color:var(--mut);cursor:pointer">${last?"결과 보러 가기… ✨":"다음 문항으로… ✨"} <span style="font-weight:600;opacity:.8">(클릭·스페이스로 바로)</span></div>`;
   el2.querySelector('.fx').style.animation="popIn .25s ease both";
+  pendingAdvance=true;
+  clearTimeout(advTimer);
+  advTimer=setTimeout(nextTurn, 1700);
 }
-function nextTurn(){ G.t++; screenTurn(); }
+function nextTurn(){ if(!pendingAdvance) return; pendingAdvance=false; clearTimeout(advTimer); advTimer=null; G.t++; screenTurn(); }
 /* 스페이스/엔터로 '다음 ▶' 넘기기 (입력창에선 무시) */
 document.addEventListener('keydown', function(e){
   var t=e.target;
