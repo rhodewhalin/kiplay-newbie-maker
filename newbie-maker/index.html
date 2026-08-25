@@ -206,6 +206,8 @@
   .fxpop-inner{background:var(--paper);border:3px solid var(--ink);border-radius:18px;box-shadow:6px 7px 0 var(--ink);padding:20px 22px;max-width:380px;width:100%;text-align:center;animation:fxpop .32s cubic-bezier(.2,.9,.3,1.5) both}
   .fxpop-title{font-size:13px;font-weight:800;color:var(--blue-d);margin-bottom:10px}
   .fxpop-hint{font-size:11px;color:var(--mut);font-weight:700;margin-top:12px}
+  .fx .fxi{display:block;margin:4px 0;white-space:nowrap;font-weight:700}
+  .fx .fxnote{white-space:normal;color:var(--bad);font-weight:800;margin:2px 0 8px}
   @keyframes fxbg{0%{opacity:0}100%{opacity:1}}
   @keyframes fxpop{0%{opacity:0;transform:scale(.7) translateY(12px)}100%{opacity:1;transform:none}}
 </style>
@@ -840,10 +842,10 @@ let advTimer=null, pendingAdvance=false;
 function showTurnResult(ch,whisper,m){
   document.querySelectorAll('.choice').forEach(function(b){b.disabled=true;b.style.opacity=".5";b.style.pointerEvents="none";b.style.boxShadow="none";});
   const txt=ch.length?ch.map(function(c){
-    if(c[1]==="note") return `<b style="color:var(--bad)">💢 ${c[0]}</b>`;
-    if(c[1]==="it") return `${c[0]} <b class="it">관심 ♥</b>`;
-    return `${c[0]} <b class="${c[1]}">${c[1]==="up"?"+":"−"}${c[2]}</b>`;
-  }).join(" · "):"기록됨";
+    if(c[1]==="note") return `<div class="fxi fxnote">💢 ${c[0]}</div>`;
+    if(c[1]==="it") return `<div class="fxi">${c[0]} <b class="it">관심 ♥</b></div>`;
+    return `<div class="fxi">${c[0]} <b class="${c[1]}">${c[1]==="up"?"+":"−"}${c[2]}</b></div>`;
+  }).join(""):`<div class="fxi">기록됨</div>`;
   const last=(G.t+1>=G.turns.length);
   const el2=document.getElementById('turnResult'); if(el2) el2.innerHTML='';
   var oldPop=document.querySelector('.fxpop'); if(oldPop) oldPop.remove();
