@@ -133,7 +133,7 @@
   .scene .who img,.scene .who svg{width:auto;object-fit:contain;
     filter:drop-shadow(0 5px 4px rgba(0,0,0,.30));animation:bob 3.2s ease-in-out infinite}
   .scene.play .who img,.scene.play .who svg,.scene.start .who img,.scene.start .who svg{height:96%}
-  .scene.result .who img,.scene.result .who svg{height:92%}
+  .scene.result .who img,.scene.result .who svg{height:68%}
   .scene .tag{position:absolute;left:10px;top:9px;background:rgba(255,255,255,.93);border:2px solid var(--ink);
     border-radius:999px;padding:3px 12px;font-size:11.5px;font-weight:800;box-shadow:2px 2px 0 var(--ink)}
   .scene.result .shine{position:absolute;inset:0;pointer-events:none;
@@ -640,7 +640,7 @@ function screenStart(){
     {n:"02",t:"업무 퀴즈",d:"회사 현안, 당신의 선택은?"},
     {n:"03",t:"성향 질문",d:"정답 없음. 직장 본능이 기록됨"},
     {n:"04",t:"돌발 이벤트",d:"예측불가 사건에 어떻게?"},
-    {n:"05",t:"20년 후",d:"수습 딱지 떼고 정규 사원증 공개"}
+    {n:"05",t:"20년 후",d:"내 모습 공개 + 사원증 카드로 저장"}
   ];
   el(`
   <div class="card hero">
@@ -901,14 +901,15 @@ function screenResult(){
 
   el(`
   <div class="card">
-    <div class="badge">🎉 20년 후, ${G.nick}의 사원증 공개!</div>
-    <div class="resulthero" style="background-image:url('${BG_IMG[bgIdx]}')">
+    <div class="badge">🎉 ${G.nick}의 20년 후 모습!</div>
+    <div class="scene result" style="background-image:url('${BG_IMG[bgIdx]}')">
       <div class="shine"></div>
-      ${idBadge(G.char,{name:G.nick,role:ch.e+" "+ch.name,grade:GRADE_LABEL[grade],color:TYPE_COLOR[ch.id]||"#2f6fed",no:"KIPI · "+score.toLocaleString()+" P"})}
+      <div class="who">${charSVG(G.char,200,"cheer")}</div>
     </div>
     <div class="charcard" style="border-top-left-radius:0;border-top-right-radius:0;margin-top:0">
       <div class="cname">${ch.e} ${ch.name}!</div>
       <div class="cdesc">${ch.desc}</div>
+      <div class="grade">${GRADE_LABEL[grade]} · ${score.toLocaleString()}점</div>
     </div>
 
     <div class="rsec" style="animation-delay:.06s">
@@ -989,7 +990,7 @@ function makeCard(){
     roundRect(ctx,22,22,W-44,H-44,26); ctx.fill(); ctx.stroke();
     ctx.textAlign="center";
     ctx.fillStyle="#e8503a"; ctx.font="800 23px 'Malgun Gothic',sans-serif";
-    ctx.fillText(G.nick+"의 20년 후 배치 결과", W/2, 76);
+    ctx.fillText(G.nick+"의 20년 후 사원증", W/2, 76);
     var bx0=44, by0=92, bw=W-88, bh=228, bBot=by0+bh;
     ctx.save();
     roundRect(ctx,bx0,by0,bw,bh,20); ctx.clip();
