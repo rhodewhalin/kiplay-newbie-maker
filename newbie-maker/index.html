@@ -906,7 +906,7 @@ function screenResult(){
       <div class="shine"></div>
       <div class="who">${charSVG(G.char,200,"cheer")}</div>
     </div>
-    <div class="charcard" style="border-top-left-radius:0;border-top-right-radius:0;margin-top:0">
+    <div class="charcard" style="border-top-left-radius:0;border-top-right-radius:0;margin-top:0;box-shadow:none">
       <div class="cname">${ch.e} ${ch.name}!</div>
       <div class="cdesc">${ch.desc}</div>
       <div class="grade">${GRADE_LABEL[grade]} · ${score.toLocaleString()}점</div>
@@ -1041,7 +1041,7 @@ function makeCard(){
     document.getElementById('cardArea').innerHTML=
       '<img id="cardImg" src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
      +'<button id="saveCardBtn" class="btn blue" style="margin-top:8px;width:100%">💾 이미지 저장</button>'
-     +'<div style="font-size:11px;color:#6b5a1a;margin-top:6px;text-align:center;line-height:1.4">저장이 안 되면 <b>위 카드 이미지를 꾹 눌러</b> 저장하세요 (휴대폰)</div>';
+     +'<div style="font-size:11px;color:#6b5a1a;margin-top:6px;text-align:center;line-height:1.4">저장 버튼이 안 되면 <b>카드 이미지를 우클릭(PC)·꾹 누르기(폰)</b> → 이미지 저장</div>';
     var gb=document.getElementById('genCardBtn'); if(gb) gb.style.display='none';
     var sb=document.getElementById('saveCardBtn'), blobRef=null, fileRef=null;
     function dlCard(){ var a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); }
