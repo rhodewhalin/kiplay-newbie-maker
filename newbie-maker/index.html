@@ -990,43 +990,52 @@ function makeCard(){
     roundRect(ctx,22,22,W-44,H-44,26); ctx.fill(); ctx.stroke();
     ctx.textAlign="center";
     ctx.fillStyle="#e8503a"; ctx.font="800 23px 'Malgun Gothic',sans-serif";
-    ctx.fillText(G.nick+"의 20년 후 사원증", W/2, 76);
-    var bx0=44, by0=92, bw=W-88, bh=228, bBot=by0+bh;
-    ctx.save();
-    roundRect(ctx,bx0,by0,bw,bh,20); ctx.clip();
-    if(bgImg){
-      var sc=Math.max(bw/bgImg.width, bh/bgImg.height), dw=bgImg.width*sc, dh=bgImg.height*sc;
-      ctx.drawImage(bgImg, bx0+(bw-dw)/2, by0+(bh-dh)/2, dw, dh);
-    } else { ctx.fillStyle="#eaf0ff"; ctx.fillRect(bx0,by0,bw,bh); }
-    var grad=ctx.createLinearGradient(0,bBot-64,0,bBot);
-    grad.addColorStop(0,"rgba(255,253,246,0)"); grad.addColorStop(1,"rgba(255,253,246,.5)");
-    ctx.fillStyle=grad; ctx.fillRect(bx0,bBot-64,bw,64);
-    var chS=216; ctx.drawImage(charImg, W/2-chS/2, bBot-chS+8, chS, chS);
+    ctx.fillText(G.nick+"의 20년 후 사원증", W/2, 62);
+    var tc=(typeof TYPE_COLOR!=='undefined' && r.ch && TYPE_COLOR[r.ch.id])?TYPE_COLOR[r.ch.id]:"#2f6fed";
+    // ---- 사원증 카드 ----
+    ctx.fillStyle="#fff"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=5;
+    roundRect(ctx,120,80,440,566,22); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#cdd3db"; ctx.lineWidth=4; roundRect(ctx,305,90,70,16,6); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=tc; ctx.lineWidth=3; roundRect(ctx,142,118,396,38,10); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#fff"; ctx.font="800 21px 'Malgun Gothic',sans-serif"; ctx.textBaseline="middle";
+    ctx.fillText("한국특허정보원", W/2, 138); ctx.textBaseline="alphabetic";
+    var px=146,py=166,pw=388,ph=286;
+    ctx.save(); roundRect(ctx,px,py,pw,ph,12); ctx.clip();
+    if(bgImg){ var sc=Math.max(pw/bgImg.width,ph/bgImg.height),dw=bgImg.width*sc,dh=bgImg.height*sc; ctx.drawImage(bgImg,px+(pw-dw)/2,py+(ph-dh)/2,dw,dh); }
+    else { ctx.fillStyle="#eef2f8"; ctx.fillRect(px,py,pw,ph); }
+    var chH=ph*0.94,chW=chH; ctx.drawImage(charImg,px+pw/2-chW/2,py+ph-chH+8,chW,chH);
     ctx.restore();
-    ctx.strokeStyle="#1c1a17"; ctx.lineWidth=4; roundRect(ctx,bx0,by0,bw,bh,20); ctx.stroke();
-    ctx.textAlign="center";
-    var nameStr=r.ch.e+" "+r.ch.name, nfs=40, nmaxW=W-108;
-    ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif";
-    while(ctx.measureText(nameStr).width>nmaxW && nfs>22){ nfs-=1; ctx.font="800 "+nfs+"px 'Malgun Gothic',sans-serif"; }
-    ctx.fillStyle="#1c1a17"; ctx.fillText(nameStr, W/2, 374);
-    ctx.fillStyle="#1e50bb"; ctx.font="800 26px 'Malgun Gothic',sans-serif";
-    ctx.fillText(GRADE_LABEL[r.grade]+" · "+r.score.toLocaleString()+"점", W/2, 412);
-    ctx.fillStyle="#5a5347"; ctx.font="600 19px 'Malgun Gothic',sans-serif";
-    ctx.fillText("어울리는 일 · "+r.fitJob, W/2, 444);
-    var keys=STAT_KEYS, top=492;
+    ctx.strokeStyle="#1c1a17"; ctx.lineWidth=3; roundRect(ctx,px,py,pw,ph,12); ctx.stroke();
+    ctx.textAlign="center"; ctx.fillStyle="#1c1a17"; ctx.font="800 28px 'Malgun Gothic',sans-serif";
+    ctx.fillText(G.nick, W/2, 500);
+    var roleStr=r.ch.e+" "+r.ch.name, rfs=21;
+    ctx.font="800 "+rfs+"px 'Malgun Gothic',sans-serif";
+    while(ctx.measureText(roleStr).width>398 && rfs>13){ rfs-=1; ctx.font="800 "+rfs+"px 'Malgun Gothic',sans-serif"; }
+    ctx.fillStyle=tc; ctx.fillText(roleStr, W/2, 532);
+    ctx.font="800 15px 'Malgun Gothic',sans-serif";
+    var gtxt=GRADE_LABEL[r.grade], gw=ctx.measureText(gtxt).width;
+    ctx.fillStyle="#ffd23f"; ctx.strokeStyle="#1c1a17"; ctx.lineWidth=2.5;
+    roundRect(ctx,W/2-gw/2-14,552,gw+28,30,15); ctx.fill(); ctx.stroke();
+    ctx.fillStyle="#1c1a17"; ctx.textBaseline="middle"; ctx.fillText(gtxt,W/2,567); ctx.textBaseline="alphabetic";
+    ctx.fillStyle="#8a7f6a"; ctx.font="700 13px 'Malgun Gothic',sans-serif";
+    ctx.fillText("KIPI · "+r.score.toLocaleString()+" P", W/2, 606);
+    ctx.fillStyle="#8a7f6a"; ctx.font="800 15px 'Malgun Gothic',sans-serif";
+    ctx.fillText("20년간 키운 능력치 (성장분)", W/2, 682);
+    var keys=STAT_KEYS, top=712;
     keys.forEach(function(k,i){
       var col=i%2, row=Math.floor(i/2);
-      var bx=64+col*312, by=top+row*72;
-      ctx.textAlign="left"; ctx.fillStyle="#1c1a17"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
+      var bx=64+col*312, by=top+row*40;
+      ctx.textAlign="left"; ctx.fillStyle="#1c1a17"; ctx.font="700 15px 'Malgun Gothic',sans-serif";
       ctx.fillText(k, bx, by);
       ctx.textAlign="right"; ctx.fillText("+"+(s[k]-25), bx+252, by);
-      ctx.strokeStyle="#1c1a17"; ctx.lineWidth=2.5; ctx.fillStyle="#fff";
-      roundRect(ctx,bx,by+9,252,16,8); ctx.fill(); ctx.stroke();
-      ctx.fillStyle="#2f6fed"; var w=Math.max(6,Math.min(252,(s[k]-25)/30*252));
-      roundRect(ctx,bx,by+9,w,16,8); ctx.fill();
+      ctx.strokeStyle="#1c1a17"; ctx.lineWidth=2; ctx.fillStyle="#fff";
+      roundRect(ctx,bx,by+7,252,12,6); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=tc; var w=Math.max(5,Math.min(252,(s[k]-25)/30*252));
+      roundRect(ctx,bx,by+7,w,12,6); ctx.fill();
+      ctx.textAlign="center";
     });
-    ctx.textAlign="center"; ctx.fillStyle="#8a7f6a"; ctx.font="700 19px 'Malgun Gothic',sans-serif";
-    ctx.fillText("신입사원 메이커 · 20년 후의 나", W/2, H-42);
+    ctx.textAlign="center"; ctx.fillStyle="#8a7f6a"; ctx.font="700 17px 'Malgun Gothic',sans-serif";
+    ctx.fillText("신입사원 메이커 · 20년 후의 나", W/2, H-40);
     var url=cv.toDataURL('image/png');
     var fname='신입사원메이커_'+G.nick+'.png';
     document.getElementById('cardArea').innerHTML=
