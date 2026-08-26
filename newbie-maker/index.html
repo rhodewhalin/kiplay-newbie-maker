@@ -575,7 +575,7 @@ function buildTurns(seed){
 
 /* ---------- 상태 ---------- */
 let G=null;
-let chosenChar=0, chosenGender="남";
+let chosenChar=0, chosenGender="여";
 function imgFor(idx,gender,aged){ var s=CHAR_IMG[idx][gender==="여"?"여":"남"]; return aged?s.o:s.y; }
 function selectChar(i){ chosenChar=i; document.querySelectorAll('.charopt').forEach((el,j)=>el.classList.toggle('on',j===i));
   renderHeroBadge(); }
@@ -677,7 +677,7 @@ function screenStart(){
     </div>
     <div style="border-top:2px dashed #cabfa4;margin:16px 0 12px"></div>
     <label>닉네임 <span style="font-weight:400;color:#8a94a8">(사원증에 새겨져요)</span></label>
-    <input id="nick" type="text" maxlength="12" placeholder="예: 혜연" oninput="updateBadgeName(this.value)" />
+    <input id="nick" type="text" maxlength="12" placeholder="예: 키피" oninput="updateBadgeName(this.value)" />
     <label>내 캐릭터 고르기 <span style="font-weight:400;color:#8a94a8">(성별·성격 선택 · 아래 사원증이 바뀌어요)</span></label>
     <div class="genderseg">${genderSegHTML()}</div>
     <div class="charpick" id="charpick">${pickerButtonsHTML()}</div>
