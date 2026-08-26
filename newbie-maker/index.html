@@ -906,12 +906,12 @@ function traitAxis(label,neg,pos,val){ // val -N..+N → 위치 %
 function screenReveal(){
   el(`
   <div class="card" style="text-align:center">
-    <div class="badge" style="background:var(--red)">🥁 두구두구…</div>
+    <div class="badge" style="background:var(--red);color:#fff;border-color:var(--red)">🥁 두구두구…</div>
     <h2 style="margin:12px 0 4px">15번의 선택, 끝!</h2>
     <p class="sub" style="margin:0 0 4px">20년 후의 <b>${G.nick}</b>, 과연 어떤 모습일까요?</p>
     <div class="revealcard" onclick="screenResult()">
       <div class="qmark">?</div>
-      <div class="rlabel">🎴 카드 뒤집기</div>
+      <div class="rlabel">✨ 카드 뒤집기</div>
     </div>
     <button class="btn" onclick="screenResult()">결과 확인하기 ▶</button>
     <p class="muted">두근두근… 20년 후의 내 사원증이 완성됐어요!</p>
