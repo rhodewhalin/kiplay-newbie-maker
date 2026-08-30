@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>신입사원 메이커: 20년 후의 나 — 프로토타입 v4</title>
 <style>
   :root{
@@ -16,7 +16,8 @@
     background-color:var(--cream);
     background-image:radial-gradient(#d8ceb2 1.3px, transparent 1.4px);
     background-size:22px 22px;color:var(--ink);min-height:100vh;word-break:keep-all;overflow-wrap:break-word}
-  .wrap{max-width:640px;margin:0 auto;padding:18px 16px 60px}
+  .wrap{max-width:640px;margin:0 auto;
+    padding:18px calc(16px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left))}
   .ghead{display:flex;align-items:center;gap:8px;margin-bottom:16px}
   .ghead .logo{font-size:26px;line-height:1}
   .ghead .title{font-size:18px;font-weight:800;color:var(--blue-d);letter-spacing:-.5px}
@@ -214,6 +215,45 @@
   .fx .fxnote{white-space:normal;color:var(--bad);font-weight:800;margin:2px 0 8px}
   @keyframes fxbg{0%{opacity:0}100%{opacity:1}}
   @keyframes fxpop{0%{opacity:0;transform:scale(.7) translateY(12px)}100%{opacity:1;transform:none}}
+  /* ===== 모바일 반응형 (데스크톱 회귀 없음 — max-width 안에서만 조정) ===== */
+  .tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  @media(max-width:480px){
+    /* 카드/타이포 유동화 */
+    .wrap{padding-top:14px;
+      padding-left:calc(13px + env(safe-area-inset-left));
+      padding-right:calc(13px + env(safe-area-inset-right));
+      padding-bottom:calc(46px + env(safe-area-inset-bottom))}
+    .card{padding:clamp(15px,4.6vw,22px);border-radius:16px}
+    h1{font-size:clamp(20px,5.8vw,24px)}
+    h2{font-size:clamp(15px,4.4vw,17px)}
+    .ghead .title{font-size:clamp(15px,4.4vw,18px)}
+    .sub{font-size:clamp(12px,3.4vw,13px)}
+    .charcard{padding:18px 15px}
+    .charcard .cname{font-size:clamp(18px,5.2vw,22px)}
+    /* 이미지·SVG·사원증이 화면 밖으로 넘치지 않도록 */
+    img,svg{max-width:100%;height:auto}
+    .idcard{max-width:100%}
+    .idphoto img,.idphoto svg{height:98%}
+    /* 탭 타깃 ≥44px + 손가락 간격 확보 */
+    .btn{padding:14px 16px;min-height:50px}
+    .row2{gap:12px}
+    .choices{gap:12px}
+    .choice{min-height:48px;padding:14px 15px}
+    .genderseg{gap:10px}
+    .gseg{min-height:46px;padding:11px 6px}
+    .charopt{min-height:46px}
+    .charpick{gap:10px}
+    /* 결과 스탯칩(3열)이 좁을 때 여백 축소 */
+    .statrow{gap:6px}
+    .statchip{padding:7px 4px}
+    .statchip .l{font-size:10px}
+    .statchip .v{font-size:12.5px}
+  }
+  @media(max-width:360px){
+    .charpick{grid-template-columns:1fr}
+    .dex{grid-template-columns:repeat(2,1fr)}
+    .idcard{width:180px}
+  }
 </style>
 </head>
 <body>
@@ -1115,11 +1155,11 @@ function makeCard(){
 function lbTable(seed,meId){
   const lb=loadLB(seed).slice(0,10);
   if(!lb.length) return `<p class="sub">아직 기록이 없습니다. 첫 주자가 되어보세요!</p>`;
-  return `<table><tr><th class="rank">#</th><th>닉네임</th><th>점수</th><th>캐릭터</th></tr>
+  return `<div class="tscroll"><table><tr><th class="rank">#</th><th>닉네임</th><th>점수</th><th>캐릭터</th></tr>
     ${lb.map((e,i)=>`<tr class="${e.id===meId?'me':''}"><td class="rank">${i+1}</td>
       <td>${e.nick}</td><td>${GRADE_EMOJI[e.grade]||""} <b>${e.score.toLocaleString()}</b></td>
       <td style="font-size:12px">${e.char||e.ending||"-"}</td></tr>`).join("")}
-  </table>`;
+  </table></div>`;
 }
 
 screenStart();
