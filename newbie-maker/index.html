@@ -613,6 +613,28 @@ function buildTurns(seed){
   return shuffle(p,rnd);
 }
 
+/* ---------- KIPlay 허브 온보딩 ---------- */
+// ?onboard=1 로 열리면: 닉네임 안내(실명·사번 금지) + 결과에서 사원증 자동 생성 + "허브 입장" 버튼.
+// 입장 시 이름·성별·결과 타입·카드 이미지를 같은 도메인 localStorage(kiplay.profile)에 저장 → /lobby-next/ 가 읽어 캐릭터를 만든다. 서버 전송 없음.
+const ONBOARD=/(^|[?&])onboard=1(&|$)/.test(location.search);
+const PROFILE_KEY="kiplay.profile";
+let __hubCard=null;
+function enterHub(){
+  if(!G||!G.result) return;
+  var ch=G.result.ch||{};
+  var profile={v:1,name:G.nick,gender:G.gender,type:ch.id||"균형",typeName:ch.name||"",emoji:ch.e||"",charIdx:chosenChar,
+    grade:G.result.grade,score:G.result.score,card:__hubCard,at:new Date().toISOString(),fresh:true};
+  try{ localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); }
+  catch(e){ try{ profile.card=null; localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); }catch(e2){} }
+  location.href="/lobby-next/";
+}
+function renderHubEnter(ready){
+  var h=document.getElementById('hubEnter'); if(!h) return;
+  h.innerHTML='<div class="card ctaband" style="margin-top:10px"><h2>🏢 KIPlay 로비로 입장</h2>'
+    +'<p class="sub" style="margin:0">이 사원증의 <b>'+(G.result&&G.result.ch?G.result.ch.name:'')+'</b> 캐릭터가 로비의 내 아바타가 돼요.</p><div style="height:10px"></div>'
+    +'<button class="btn blue" style="width:100%" onclick="enterHub()" '+(ready?'':'disabled')+'>'+(ready?'로비 입장하기 →':'사원증 만드는 중…')+'</button></div>';
+}
+
 /* ---------- 상태 ---------- */
 let G=null;
 let chosenChar=0, chosenGender="여";
@@ -717,6 +739,7 @@ function screenStart(){
     </div>
     <div style="border-top:2px dashed #cabfa4;margin:16px 0 12px"></div>
     <label>닉네임 <span style="font-weight:400;color:#8a94a8">(사원증에 새겨져요)</span></label>
+    ${ONBOARD?`<p class="muted" style="margin:0 0 6px;color:#b0483a"><b>실명·사번·이메일은 쓰지 마세요.</b> 이 닉네임으로 KIPlay 로비에 등장해요.</p>`:``}
     <input id="nick" type="text" maxlength="12" placeholder="예: 키피" oninput="updateBadgeName(this.value)" />
     <label>내 캐릭터 고르기 <span style="font-weight:400;color:#8a94a8">(성별·성격 선택 · 아래 사원증이 바뀌어요)</span></label>
     <div class="genderseg">${genderSegHTML()}</div>
@@ -1034,6 +1057,7 @@ function screenResult(){
       <div style="font-size:12px;color:#6b5a1a;margin-bottom:9px">이미지로 저장해 동료에게 자랑해 보세요!</div>
       <div id="cardArea" style="margin-bottom:9px"></div>
       <button id="genCardBtn" class="btn blue" onclick="makeCard()">결과 카드 생성하기 ✨</button>
+      <div id="hubEnter"></div>
     </div>
     <button class="btn" onclick="screenStart()">🔄 다른 신입으로 다시 키우기</button>
     <div style="height:9px"></div>
@@ -1055,6 +1079,7 @@ function screenResult(){
     <p class="muted">💡 점수는 '얼마나 잘 키웠나'를 보여주는 <b>육성 게임 점수</b>예요.<br>성향·캐릭터엔 정답도 우열도 없으니 편하게 즐기세요 — 다시 하면 쑥쑥 올라요!<br>※ 프로토타입은 이 브라우저에만 저장됩니다.</p>
   </div>`);
   drawRadar("radarResult", s);
+  if(ONBOARD){ renderHubEnter(false); makeCard(); }
 }
 function start2(){ newGame(G.nick,G.seed); screenTurn(); }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
@@ -1124,6 +1149,7 @@ function makeCard(){
     ctx.textAlign="center"; ctx.fillStyle="#8a7f6a"; ctx.font="700 17px 'Malgun Gothic',sans-serif";
     ctx.fillText("신입사원 메이커 · 20년 후의 나", W/2, H-40);
     var url=cv.toDataURL('image/png');
+    __hubCard=url; if(ONBOARD) renderHubEnter(true);
     var fname='신입사원메이커_'+G.nick+'.png';
     document.getElementById('cardArea').innerHTML=
       '<img id="cardImg" src="'+url+'" alt="결과 카드" style="max-width:100%;border:2.5px solid #1c1a17;border-radius:12px;display:block;box-shadow:2px 2px 0 #1c1a17"/>'
@@ -1149,7 +1175,7 @@ function makeCard(){
       try{ fileRef=new File([blob],fname,{type:'image/png'}); }catch(e){}
       if(navigator.canShare && fileRef && navigator.canShare({files:[fileRef]})){ sb.textContent='💾 이미지 저장 / 공유'; }
     },'image/png'); }
-  }).catch(function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; });
+  }).catch(function(){ document.getElementById('cardArea').innerHTML='<div style="color:#d64545;font-size:13px;font-weight:700">카드 생성 실패 😢 다시 시도해 주세요.</div>'; if(ONBOARD) renderHubEnter(true); });
 }
 
 function lbTable(seed,meId){
